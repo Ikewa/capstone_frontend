@@ -1,0 +1,37 @@
+.post-bar {
+    border: 10 px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    background-color: #5DC260;
+    width: 750px;
+    height: 150px;
+    margin-left: 500px;
+}
+
+    textarea {
+        width: 60%;
+        height: 60px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        resize: none;
+        font-size: 14px;
+        margin-top: 10px;
+        margin-left: 20px;
+        
+    }
+
+ button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 650px;
+}
+
+.post-bar input[type="file"] {
+    border-radius: 30px;
+}
