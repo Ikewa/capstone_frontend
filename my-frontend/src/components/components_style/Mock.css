@@ -1,0 +1,64 @@
+.area {
+    display: flex;
+    flex-direction: row;
+  border-top: 1px solid #000;
+  padding: 10px;
+  margin-left: 10px;
+}
+
+.profile2{
+    background-color: gray;
+    border: 1px solid #000;
+    border-radius: 10px;
+    height: 25px;
+    color: #000;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-top: 60px;
+}
+
+.profile2:hover {
+    background-color: #5DC260;
+    color: white;
+}
+
+.content {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+.image {
+    width: 1000px;
+    height: 1000px;
+    border-radius: 15%;
+    object-fit: cover;
+    margin-left: 300px;
+}
+
+.icons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+}
+
+.like, .dislike, .comments, .share {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.like{
+    color: #5DC260;
+    font-weight: bold;
+}
+
+.date {
+    color: #555;
+    font-size: 14px;
+    margin-top: 200px;
+}
+.date2 {
+    color: #555;
+    font-size: 14px;
+    margin-top: 1100px;
+}

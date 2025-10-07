@@ -1,7 +1,8 @@
 import Profile from "../components/Profile";
 import Sidebar from "../components/Sidebar"
 import Topbar from "../components/Topbar";
-import "./pages_style/Landing.css"
+import "./pages_style/Landing.css";
+import "./pages_style/Notyet.css";
 
 function Notifications() {
     return (
@@ -11,8 +12,10 @@ function Notifications() {
                <Profile />
             </div>
             <hr className="divider" />
-            <Sidebar />
-            <h1>Notifications Page</h1>
+            <div className="information">
+                <Sidebar />
+                <h1 className="message">You Don't Have Any Notifications Yet</h1>
+            </div>
         </div>
     );
 }
