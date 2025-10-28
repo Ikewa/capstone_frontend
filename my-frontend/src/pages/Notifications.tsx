@@ -1,20 +1,13 @@
-import Profile from "../components/Profile";
 import Sidebar from "../components/Sidebar"
-import Topbar from "../components/Topbar";
-import "./pages_style/Landing.css";
-import "./pages_style/Notyet.css";
+
 
 function Notifications() {
     return (
         <div>
-            <div className="top">
-               <Topbar />
-               <Profile />
-            </div>
-            <hr className="divider" />
-            <div className="information">
+        
+            <div style={{ display: 'flex' }}>
                 <Sidebar />
-                <h1 className="message">You Don't Have Any Notifications Yet</h1>
+                <h1 style={{ margin: '500px' }}>You Don't Have Any Notifications Yet</h1>
             </div>
         </div>
     );
