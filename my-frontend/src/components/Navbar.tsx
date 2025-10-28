@@ -32,6 +32,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import MapIcon from '@mui/icons-material/Map';
+import SettingsIcon from '@mui/icons-material/Settings';
 import axios from 'axios';
 
 interface Notification {
@@ -64,6 +65,7 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     fetchUnreadCount();
   }, []);
+  
 
   const fetchUnreadCount = async () => {
     try {
@@ -246,6 +248,10 @@ const navItems = getNavItems();
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
   };
 
+    function handleMenuClose() {
+        throw new Error('Function not implemented.');
+    }
+
   return (
     <AppBar position="sticky" sx={{ backgroundColor: '#2e7d32' }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -421,13 +427,27 @@ const navItems = getNavItems();
             </Typography>
           </Box>
           <Divider />
-          <MenuItem onClick={() => { navigate('/profile'); handleProfileMenuClose(); }}>
-            <PersonIcon sx={{ mr: 1 }} /> My Profile
-          </MenuItem>
+          <MenuItem onClick={() => { 
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const userData = JSON.parse(atob(token.split('.')[1]));
+                    navigate(`/profile/${userData.id}`);
+                }
+                handleProfileMenuClose(); 
+                }}>
+                <PersonIcon sx={{ mr: 1 }} /> My Profile
+            </MenuItem>
           <MenuItem onClick={handleLogout}>
             <LogoutIcon sx={{ mr: 1 }} /> Logout
           </MenuItem>
         </Menu>
+        <MenuItem onClick={() => {
+            handleMenuClose();
+            navigate('/settings');
+            }}>
+            <SettingsIcon sx={{ mr: 1 }} />
+            Settings
+        </MenuItem>
 
         {/* Mobile Menu */}
         <Menu

@@ -21,6 +21,8 @@ import ManageBookingsPage from './pages/ManageBookingsPage'
 import MapPage from './pages/MapPage'
 import CreateEventPage from './pages/CreateEventPage'
 import MyEventsPage from './pages/MyEventsPage'
+import ProfilePage from "./pages/ProfilePage"
+import SettingsPage from './pages/SettingsPage'
 
 function App() {
   return (
@@ -46,7 +48,11 @@ function App() {
         <Route path="/book-consultation" element={<BookingRequestPage />} />
         <Route path="/my-bookings" element={<MyBookingsPage />} />
         <Route path="/manage-bookings" element={<ManageBookingsPage />} />
+        <Route path="/profile/:id" element={<ProfilePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="/map" element={<MapPage />} />
+        <Route path="*" element={<NotFound />} />
+
         // PUBLIC EVENTS (Everyone can see)
         <Route path="/events" element={<EventsPage />} />  {/* NOT Events.tsx! */}
         <Route path="/events/:id" element={<EventDetailPage />} />
@@ -54,7 +60,6 @@ function App() {
         // OFFICER ONLY - My Events Management
         <Route path="/my-events" element={<MyEventsPage />} />
         <Route path="/create-event" element={<CreateEventPage />} />
-        <Route path="*" element={<NotFound />} />
       </Routes>
     </ToastProvider>
   )

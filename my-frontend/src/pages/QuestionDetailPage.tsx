@@ -390,8 +390,17 @@ function QuestionDetailPage() {
                         {question.first_name?.[0]}{question.last_name?.[0]}
                       </Avatar>
                       <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {question.first_name} {question.last_name}
+                        <Typography
+                            variant="body1"
+                            onClick={() => navigate(`/profile/${question.user_id}`)}
+                            sx={{
+                                cursor: 'pointer',
+                                color: 'primary.main',
+                                fontWeight: 'bold',
+                                '&:hover': { textDecoration: 'underline' }
+                            }}
+                            >
+                            {question.first_name} {question.last_name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                           Asked {timeAgo(question.created_at)}
@@ -557,8 +566,17 @@ function QuestionDetailPage() {
                         {answer.first_name?.[0]}{answer.last_name?.[0]}
                       </Avatar>
                       <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {answer.first_name} {answer.last_name}
+                        <Typography
+                            variant="body1"
+                            onClick={() => navigate(`/profile/${answer.user_id}`)}
+                            sx={{
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                color: 'primary.main',
+                                '&:hover': { textDecoration: 'underline' }
+                            }}
+                            >
+                            {answer.first_name} {answer.last_name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                           Answered {timeAgo(answer.created_at)}

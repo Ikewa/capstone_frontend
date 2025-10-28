@@ -45,6 +45,7 @@ function timeAgo(dateString: string) {
 }
 
 interface Question {
+  user_id: any
   id: number
   title: string
   description: string
@@ -394,8 +395,23 @@ function ForumPage() {
                         >
                             {question.first_name?.[0]}{question.last_name?.[0]}
                         </Avatar>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {question.first_name} {question.last_name}
+                        <Typography variant="body2" color="text.secondary">
+                            Asked by{' '}
+                            <Box
+                                component="span"
+                                onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/profile/${question.user_id}`);
+                                }}
+                                sx={{
+                                color: 'primary.main',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                '&:hover': { textDecoration: 'underline' }
+                                }}
+                            >
+                                {question.first_name} {question.last_name}
+                            </Box>
                         </Typography>
                         </Box>
 
