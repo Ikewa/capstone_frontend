@@ -23,44 +23,56 @@ import CreateEventPage from './pages/CreateEventPage'
 import MyEventsPage from './pages/MyEventsPage'
 import ProfilePage from "./pages/ProfilePage"
 import SettingsPage from './pages/SettingsPage'
+import ChatsPage from './pages/ChatsPage'
+import ChatPage from './pages/ChatPage'
+import { SocketProvider } from './context/SocketContext'
 
 function App() {
   return (
     <ToastProvider>
-      {/* REMOVED: <Router> wrapper - it's already in main.tsx */}
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/crop-recommendations" element={<CropRecommendationRequestPage />} />
-        <Route path="/my-crop-requests" element={<MyCropRequestsPage />} />
-        <Route path="/crop-requests/:id" element={<RequestDetailPage />} />
-        <Route path="/booking" element={<Booking />} />
-        <Route path="/landing" element={<Landing />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/Signup" element={<Signup />} />
-        <Route path="/forum" element={<Forum />} />
-        <Route path="/questions" element={<Forum />} />
-        <Route path="/questions/:id" element={<QuestionDetailPage />} />
-        <Route path="/ask-question" element={<AskQuestionPage />} />
-        <Route path="/events" element={<EventsPage />} />  
-        <Route path="/events/:id" element={<EventDetailPage />} />
-        <Route path="/crop-catalog" element={<CropCatalogPage />} />
-        <Route path="/book-consultation" element={<BookingRequestPage />} />
-        <Route path="/my-bookings" element={<MyBookingsPage />} />
-        <Route path="/manage-bookings" element={<ManageBookingsPage />} />
-        <Route path="/profile/:id" element={<ProfilePage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/map" element={<MapPage />} />
-        <Route path="*" element={<NotFound />} />
-
-        // PUBLIC EVENTS (Everyone can see)
-        <Route path="/events" element={<EventsPage />} />  {/* NOT Events.tsx! */}
-        <Route path="/events/:id" element={<EventDetailPage />} />
-
-        // OFFICER ONLY - My Events Management
-        <Route path="/my-events" element={<MyEventsPage />} />
-        <Route path="/create-event" element={<CreateEventPage />} />
-      </Routes>
+      <SocketProvider>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/Login" element={<Login />} />
+          <Route path="/Signup" element={<Signup />} />
+          
+          {/* Forum */}
+          <Route path="/forum" element={<Forum />} />
+          <Route path="/questions" element={<Forum />} />
+          <Route path="/questions/:id" element={<QuestionDetailPage />} />
+          <Route path="/ask-question" element={<AskQuestionPage />} />
+          
+          {/* Events */}
+          <Route path="/events" element={<EventsPage />} />
+          <Route path="/events/:id" element={<EventDetailPage />} />
+          <Route path="/my-events" element={<MyEventsPage />} />
+          <Route path="/create-event" element={<CreateEventPage />} />
+          
+          {/* Crops */}
+          <Route path="/crop-catalog" element={<CropCatalogPage />} />
+          <Route path="/crop-recommendations" element={<CropRecommendationRequestPage />} />
+          <Route path="/my-crop-requests" element={<MyCropRequestsPage />} />
+          <Route path="/crop-requests/:id" element={<RequestDetailPage />} />
+          
+          {/* Bookings */}
+          <Route path="/book-consultation" element={<BookingRequestPage />} />
+          <Route path="/my-bookings" element={<MyBookingsPage />} />
+          <Route path="/manage-bookings" element={<ManageBookingsPage />} />
+          
+          {/* Profile & Settings */}
+          <Route path="/profile/:id" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/chats" element={<ChatsPage />} />
+          <Route path="/chat/:conversation_id" element={<ChatPage />} />
+          
+          {/* Other */}
+          <Route path="/map" element={<MapPage />} />
+          <Route path="/booking" element={<Booking />} />
+          
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </SocketProvider>
     </ToastProvider>
   )
 }

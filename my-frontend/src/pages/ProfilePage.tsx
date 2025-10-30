@@ -25,6 +25,7 @@ import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import EventIcon from '@mui/icons-material/Event';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ChatIcon from '@mui/icons-material/Chat';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 
@@ -104,7 +105,32 @@ const ProfilePage = () => {
     );
   }
 
-  const { user, questions, answers, events, stats } = profile;
+const { user, questions, answers, events, stats } = profile;
+
+const handleStartChat = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  event.preventDefault();
+
+  try {
+    const token = localStorage.getItem('token');
+
+    console.log('🔵 Creating conversation with user:', user.id);
+
+    // Create or get conversation
+    const response = await axios.post(
+      'http://localhost:5000/api/chat/conversation',
+      { other_user_id: parseInt(user.id) },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    console.log('✅ Conversation created:', response.data);
+
+    // Navigate to the conversation
+    navigate(`/chat/${response.data.conversation_id}`);
+  } catch (err: any) {
+    console.error('❌ Error creating conversation:', err);
+    alert('Failed to start conversation: ' + (err.response?.data?.message || err.message));
+  }
+};
 
   return (
     <>
@@ -229,6 +255,14 @@ const ProfilePage = () => {
               </Box>
             </CardContent>
           </Card>
+          <Button
+            variant="contained"
+            startIcon={<ChatIcon />}
+            onClick={handleStartChat}
+            sx={{ mt: 2 }}
+            >
+            Send Message
+         </Button>
 
           {/* Tabs Section */}
           <Card>

@@ -22,6 +22,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import CommentIcon from '@mui/icons-material/Comment'
 import PersonIcon from '@mui/icons-material/Person'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
+import ChatIcon from '@mui/icons-material/Chat'
 // import EventIcon from '@mui/icons-material/Event'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import axios from 'axios'
@@ -67,6 +68,13 @@ function DashboardPage() {
       title: 'Book Officer',
       description: 'Schedule consultation',
       path: '/my-bookings',
+      color: '#689f38'
+    },
+     {
+      icon: <ChatIcon sx={{ fontSize: 40 }} />,
+      title: 'Chat with People',
+      description: 'Get instant help',
+      path: '/chats',
       color: '#689f38'
     },
   ]
