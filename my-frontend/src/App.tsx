@@ -26,6 +26,8 @@ import SettingsPage from './pages/SettingsPage'
 import ChatsPage from './pages/ChatsPage'
 import ChatPage from './pages/ChatPage'
 import { SocketProvider } from './context/SocketContext'
+import DiscussionGroupsPage from './pages/DiscussionGroupsPage'
+import GroupDiscussionPage from './pages/GroupDiscussionPage'
 
 function App() {
   return (
@@ -38,10 +40,14 @@ function App() {
           <Route path="/Signup" element={<Signup />} />
           
           {/* Forum */}
-          <Route path="/forum" element={<Forum />} />
           <Route path="/questions" element={<Forum />} />
           <Route path="/questions/:id" element={<QuestionDetailPage />} />
           <Route path="/ask-question" element={<AskQuestionPage />} />
+
+          {/* Forum - NOW DISCUSSION GROUPS */}
+          <Route path="/forum" element={<DiscussionGroupsPage />} />
+          <Route path="/discussion-groups" element={<DiscussionGroupsPage />} />
+          <Route path="/discussion-groups/:id" element={<GroupDiscussionPage />} />
           
           {/* Events */}
           <Route path="/events" element={<EventsPage />} />

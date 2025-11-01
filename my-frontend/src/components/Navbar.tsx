@@ -34,6 +34,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import MapIcon from '@mui/icons-material/Map';
 import SettingsIcon from '@mui/icons-material/Settings';
 import axios from 'axios';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface Notification {
   id: number;
@@ -291,6 +292,7 @@ const navItems = getNavItems();
               <NotificationsIcon />
             </Badge>
           </IconButton>
+          <LanguageSwitcher /> 
 
           {/* User Menu - Desktop */}
           <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1 }}>
