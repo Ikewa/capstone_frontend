@@ -149,7 +149,12 @@ const MyBookingsPage = () => {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => navigate('/book-consultation')}
-              sx={{ backgroundColor: '#1976d2' }}
+              sx={{ 
+                backgroundColor: 'secondary.main',
+                '&:hover': {
+                  backgroundColor: 'secondary.dark'
+                }
+              }}
             >
               New Booking
             </Button>
@@ -173,7 +178,12 @@ const MyBookingsPage = () => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => navigate('/book-consultation')}
-                sx={{ backgroundColor: '#1976d2' }}
+                sx={{ 
+                  backgroundColor: 'secondary.main',
+                  '&:hover': {
+                    backgroundColor: 'secondary.dark'
+                  }
+                }}
               >
                 Create Your First Booking
               </Button>

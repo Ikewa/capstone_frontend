@@ -30,9 +30,13 @@ import DirectionsIcon from '@mui/icons-material/Directions';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { ToastContext } from '../context/ToastContext';
+import Translate from '../components/Translate';
+import { useTranslate } from '../hooks/useTranslate';
+import { useLanguage } from '../context/LanguageContext';
 
 const MapPage = () => {
   const { showToast } = useContext(ToastContext);
+  const { translate } = useLanguage();
   
   const [locations, setLocations] = useState<any[]>([]);
   const [states, setStates] = useState<any[]>([]);
@@ -48,7 +52,48 @@ const MapPage = () => {
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const locationTypes = ['All', 'Supplier', 'Market', 'Aggregator', 'Equipment Rental', 'Other'];
+  // Translate labels
+  const labels = [
+    'All',
+    'Supplier',
+    'Market',
+    'Aggregator',
+    'Equipment Rental',
+    'Other',
+    'Search Locations',
+    'e.g., Seeds, Market, Kano',
+    'Location Type',
+    'State',
+    'All States',
+    'Categories:',
+    'location',
+    'locations',
+    'found',
+    'No locations found',
+    'Clear Filters',
+    'Services:',
+    'Directions',
+    'Details',
+    'Maps',
+    'Location',
+    'About',
+    'Services & Products',
+    'Contact Information',
+    'Close',
+    'Open in Maps',
+    'Get Directions',
+    'Failed to load locations'
+  ];
+  const { translated: translatedLabels } = useTranslate(labels);
+
+  const locationTypes = [
+    translatedLabels[0] || 'All',
+    translatedLabels[1] || 'Supplier',
+    translatedLabels[2] || 'Market',
+    translatedLabels[3] || 'Aggregator',
+    translatedLabels[4] || 'Equipment Rental',
+    translatedLabels[5] || 'Other'
+  ];
 
   useEffect(() => {
     fetchLocations();
@@ -65,8 +110,9 @@ const MapPage = () => {
       setError('');
     } catch (err: any) {
       console.error('❌ Error loading locations:', err);
-      setError('Failed to load locations');
-      showToast('Failed to load locations', 'error');
+      const errorMsg = await translate('Failed to load locations');
+      setError(errorMsg);
+      showToast(errorMsg, 'error');
     } finally {
       setLoading(false);
     }
@@ -82,8 +128,8 @@ const MapPage = () => {
   };
 
   const filteredLocations = locations.filter((location) => {
-    const matchesType = typeFilter === 'All' || location.type === typeFilter;
-    const matchesState = stateFilter === 'All' || location.state === stateFilter;
+    const matchesType = typeFilter === (translatedLabels[0] || 'All') || location.type === typeFilter;
+    const matchesState = stateFilter === (translatedLabels[0] || 'All') || location.state === stateFilter;
     const matchesSearch = 
       location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       location.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -157,10 +203,10 @@ const MapPage = () => {
             <MapIcon sx={{ fontSize: 48, mr: 2, color: 'primary.main' }} />
             <Box>
               <Typography variant="h4" fontWeight="bold" color="primary">
-                Agricultural Locations Directory
+                <Translate text="Agricultural Locations Directory" />
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-                Find nearby suppliers, markets, aggregators, and equipment rentals
+                <Translate text="Find nearby suppliers, markets, aggregators, and equipment rentals" />
               </Typography>
             </Box>
           </Box>
@@ -178,14 +224,14 @@ const MapPage = () => {
               <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
                 <TextField
                   fullWidth
-                  label="Search Locations"
+                  label={translatedLabels[6]}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="e.g., Seeds, Market, Kano"
+                  placeholder={translatedLabels[7]}
                 />
                 <TextField
                   select
-                  label="Location Type"
+                  label={translatedLabels[8]}
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
                   sx={{ minWidth: 200 }}
@@ -198,12 +244,12 @@ const MapPage = () => {
                 </TextField>
                 <TextField
                   select
-                  label="State"
+                  label={translatedLabels[9]}
                   value={stateFilter}
                   onChange={(e) => setStateFilter(e.target.value)}
                   sx={{ minWidth: 200 }}
                 >
-                  <MenuItem value="All">All States</MenuItem>
+                  <MenuItem value={translatedLabels[0] || 'All'}>{translatedLabels[10]}</MenuItem>
                   {states.map((state) => (
                     <MenuItem key={state.state} value={state.state}>
                       {state.state} ({state.location_count})
@@ -215,7 +261,7 @@ const MapPage = () => {
               {/* Legend */}
               <Box sx={{ display: 'flex', gap: 2, mt: 2, flexWrap: 'wrap' }}>
                 <Typography variant="body2" fontWeight="bold" sx={{ mr: 1 }}>
-                  Categories:
+                  {translatedLabels[11]}
                 </Typography>
                 {locationTypes.slice(1).map((type) => (
                   <Chip
@@ -233,36 +279,39 @@ const MapPage = () => {
               </Box>
 
               <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                {filteredLocations.length} location{filteredLocations.length !== 1 ? 's' : ''} found
+                {filteredLocations.length} {filteredLocations.length === 1 ? translatedLabels[12] : translatedLabels[13]} {translatedLabels[14]}
               </Typography>
             </CardContent>
           </Card>
 
-          {/* Locations List */}
+          {/* Locations List - 3 Cards per Row */}
           {filteredLocations.length === 0 ? (
             <Card sx={{ textAlign: 'center', py: 6 }}>
               <MapIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
               <Typography variant="h6" color="text.secondary">
-                No locations found
+                {translatedLabels[15]}
               </Typography>
               <Button
                 variant="text"
                 onClick={() => {
-                  setTypeFilter('All');
-                  setStateFilter('All');
+                  setTypeFilter(translatedLabels[0] || 'All');
+                  setStateFilter(translatedLabels[0] || 'All');
                   setSearchQuery('');
                 }}
                 sx={{ mt: 2 }}
               >
-                Clear Filters
+                {translatedLabels[16]}
               </Button>
             </Card>
           ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>
               {filteredLocations.map((location) => (
                 <Card
                   key={location.id}
                   sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
                     '&:hover': {
                       boxShadow: 6,
                       transform: 'translateY(-2px)',
@@ -270,92 +319,128 @@ const MapPage = () => {
                     },
                   }}
                 >
-                  <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
-                      <Box sx={{ flex: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          {getLocationIcon(location.type)}
-                          <Typography variant="h6" fontWeight="bold">
-                            {location.name}
-                          </Typography>
-                        </Box>
-
-                        <Box sx={{ mb: 2 }}>
-                          <Chip
-                            label={location.type}
-                            size="small"
-                            sx={{ 
-                              backgroundColor: `${getTypeColor(location.type)}20`,
-                              color: getTypeColor(location.type),
-                              fontWeight: 'bold'
-                            }}
-                          />
-                          {location.category && (
-                            <Chip
-                              label={location.category}
-                              size="small"
-                              sx={{ ml: 1 }}
-                            />
-                          )}
-                        </Box>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          <LocationOnIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                          <Typography variant="body2" color="text.secondary">
-                            {location.address}, {location.city}, {location.state}
-                          </Typography>
-                        </Box>
-
-                        {location.description && (
-                          <Typography variant="body2" sx={{ mb: 2 }}>
-                            {location.description}
-                          </Typography>
-                        )}
-
-                        {location.services && (
-                          <Box sx={{ mb: 1 }}>
-                            <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.5 }}>
-                              Services:
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {location.services}
-                            </Typography>
-                          </Box>
-                        )}
-
-                        {location.contact_phone && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                            <PhoneIcon sx={{ color: 'success.main', fontSize: 18 }} />
-                            <Typography variant="body2">
-                              {location.contact_phone}
-                            </Typography>
-                          </Box>
-                        )}
+                  <CardContent sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    {/* Header - Don't translate (business name) */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Box sx={{ color: getTypeColor(location.type) }}>
+                        {getLocationIcon(location.type)}
                       </Box>
+                      <Typography variant="h6" fontWeight="bold" sx={{ fontSize: '1rem' }}>
+                        {location.name}
+                      </Typography>
+                    </Box>
 
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: { xs: '100%', md: 'auto' } }}>
-                        <Button
-                          variant="contained"
-                          startIcon={<DirectionsIcon />}
-                          onClick={() => getDirections(location)}
-                          fullWidth
+                    {/* Type & Category - Don't translate (business categories) */}
+                    <Box sx={{ mb: 1.5 }}>
+                      <Chip
+                        label={location.type}
+                        size="small"
+                        sx={{ 
+                          backgroundColor: `${getTypeColor(location.type)}20`,
+                          color: getTypeColor(location.type),
+                          fontWeight: 'bold',
+                          height: 22,
+                          fontSize: '0.7rem'
+                        }}
+                      />
+                      {location.category && (
+                        <Chip
+                          label={location.category}
+                          size="small"
+                          sx={{ ml: 1, height: 22, fontSize: '0.7rem' }}
+                        />
+                      )}
+                    </Box>
+
+                    {/* Location - Don't translate (place names) */}
+                    <Box sx={{ display: 'flex', alignItems: 'start', gap: 0.5, mb: 1 }}>
+                      <LocationOnIcon sx={{ color: 'text.secondary', fontSize: 18, mt: 0.2 }} />
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                        {location.city}, {location.state}
+                      </Typography>
+                    </Box>
+
+                    {/* Description - Don't translate (business description) */}
+                    {location.description && (
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          mb: 1.5, 
+                          fontSize: '0.85rem',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {location.description}
+                      </Typography>
+                    )}
+
+                    {/* Services (truncated) - Don't translate (business services) */}
+                    {location.services && (
+                      <Box sx={{ mb: 1.5 }}>
+                        <Typography variant="caption" fontWeight="bold" display="block" sx={{ mb: 0.3 }}>
+                          {translatedLabels[17]}
+                        </Typography>
+                        <Typography 
+                          variant="caption" 
+                          color="text.secondary"
+                          sx={{ 
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
                         >
-                          Get Directions
-                        </Button>
+                          {location.services}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {/* Phone - Don't translate (phone number) */}
+                    {location.contact_phone && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1.5 }}>
+                        <PhoneIcon sx={{ color: 'success.main', fontSize: 16 }} />
+                        <Typography variant="caption">
+                          {location.contact_phone}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {/* Spacer to push buttons to bottom */}
+                    <Box sx={{ flexGrow: 1 }} />
+
+                    {/* Action Buttons */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
+                      <Button
+                        variant="contained"
+                        startIcon={<DirectionsIcon />}
+                        onClick={() => getDirections(location)}
+                        size="small"
+                        fullWidth
+                      >
+                        {translatedLabels[18]}
+                      </Button>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
                         <Button
                           variant="outlined"
                           onClick={() => handleLocationClick(location)}
+                          size="small"
                           fullWidth
                         >
-                          View Details
+                          {translatedLabels[19]}
                         </Button>
                         <Button
                           variant="outlined"
                           startIcon={<MapIcon />}
                           onClick={() => openInGoogleMaps(location)}
+                          size="small"
                           fullWidth
                         >
-                          Open in Maps
+                          {translatedLabels[20]}
                         </Button>
                       </Box>
                     </Box>
@@ -403,7 +488,7 @@ const MapPage = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <LocationOnIcon sx={{ color: 'primary.main' }} />
                     <Typography variant="subtitle1" fontWeight="bold">
-                      Location
+                      {translatedLabels[21]}
                     </Typography>
                   </Box>
                   <Typography variant="body1">
@@ -420,7 +505,7 @@ const MapPage = () => {
                 {selectedLocation.description && (
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
-                      About
+                      {translatedLabels[22]}
                     </Typography>
                     <Typography variant="body1">
                       {selectedLocation.description}
@@ -432,7 +517,7 @@ const MapPage = () => {
                 {selectedLocation.services && (
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
-                      Services & Products
+                      {translatedLabels[23]}
                     </Typography>
                     <Typography variant="body1">
                       {selectedLocation.services}
@@ -445,7 +530,7 @@ const MapPage = () => {
                 {/* Contact Information */}
                 <Box>
                   <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>
-                    Contact Information
+                    {translatedLabels[24]}
                   </Typography>
                   
                   {selectedLocation.contact_phone && (
@@ -478,20 +563,20 @@ const MapPage = () => {
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleCloseDialog}>Close</Button>
+              <Button onClick={handleCloseDialog}>{translatedLabels[25]}</Button>
               <Button
                 variant="outlined"
                 startIcon={<MapIcon />}
                 onClick={() => openInGoogleMaps(selectedLocation)}
               >
-                Open in Maps
+                {translatedLabels[26]}
               </Button>
               <Button
                 variant="contained"
                 startIcon={<DirectionsIcon />}
                 onClick={() => getDirections(selectedLocation)}
               >
-                Get Directions
+                {translatedLabels[27]}
               </Button>
             </DialogActions>
           </>

@@ -33,9 +33,10 @@ import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import MapIcon from '@mui/icons-material/Map';
 import SettingsIcon from '@mui/icons-material/Settings';
+import LanguageIcon from '@mui/icons-material/Language';
 import axios from 'axios';
-import LanguageSwitcher from './LanguageSwitcher';
-
+import { useLanguage } from '../context/LanguageContext';
+import Translate from '../components/Translate';
 interface Notification {
   id: number;
   type: string;
@@ -61,6 +62,8 @@ const Navbar: React.FC = () => {
   // Get user info from localStorage
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
+
+  const { language, setLanguage } = useLanguage();
 
   // Fetch notifications on mount and when notification menu opens
   useEffect(() => {
@@ -195,31 +198,30 @@ const Navbar: React.FC = () => {
     handleProfileMenuClose();
   };
 
- // Get navItems based on user role
+// Get navItems based on user role
 const getNavItems = () => {
   const baseItems = [
-    { label: 'Home', path: '/home', icon: <HomeIcon /> },
-    { label: 'Forum', path: '/forum', icon: <ForumIcon /> },
-    { label: 'Events', path: '/events', icon: <EventIcon /> },  // Public events for EVERYONE
-    { label: 'Browse Crops', path: '/crop-catalog', icon: <MenuBookIcon /> },
-    { label: 'Map', path: '/map', icon: <MapIcon /> },
+    { label: <Translate text="Home" />, path: '/home', icon: <HomeIcon /> },
+    { label: <Translate text="Forum" />, path: '/forum', icon: <ForumIcon /> },
+    { label: <Translate text="Events" />, path: '/events', icon: <EventIcon /> },
+    { label: <Translate text="Crops Recommendation" />, path: '/crop-catalog', icon: <MenuBookIcon /> },
+    { label: <Translate text="Market place" />, path: '/map', icon: <MapIcon /> },
   ];
 
   // Role-specific items
   if (user?.role === 'Extension Officer') {
     return [
       ...baseItems,
-      { label: 'My Events', path: '/my-events', icon: <EventIcon /> },  // ONLY for officers!
-      { label: 'Manage Bookings', path: '/manage-bookings', icon: <EventIcon /> },
-      { label: 'Crop Requests', path: '/my-crop-requests', icon: <AgricultureIcon /> },
+      { label: <Translate text="My Events" />, path: '/my-events', icon: <EventIcon /> },
+      { label: <Translate text="Manage Bookings" />, path: '/manage-bookings', icon: <EventIcon /> },
+      { label: <Translate text="Crop Requests" />, path: '/my-crop-requests', icon: <AgricultureIcon /> },
     ];
   } else {
     // Farmer items
     return [
       ...baseItems,
-      { label: 'My Bookings', path: '/my-bookings', icon: <EventIcon /> },
-      { label: 'Book Consultation', path: '/book-consultation', icon: <EventIcon /> },
-      { label: 'Crop Advice', path: '/my-crop-requests', icon: <AgricultureIcon /> },
+      { label: <Translate text="My Bookings" />, path: '/my-bookings', icon: <EventIcon /> },
+      { label: <Translate text="Crop Advice" />, path: '/my-crop-requests', icon: <AgricultureIcon /> },
     ];
   }
 };
@@ -292,7 +294,16 @@ const navItems = getNavItems();
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <LanguageSwitcher /> 
+          <IconButton
+              color="inherit"
+              onClick={() => setLanguage(language === 'en' ? 'ha' : 'en')}
+              sx={{ ml: 1 }}
+            >
+              <LanguageIcon />
+              <Typography variant="body2" sx={{ ml: 0.5 }}>
+                {language === 'en' ? 'EN' : 'HA'}
+              </Typography>
+          </IconButton>
 
           {/* User Menu - Desktop */}
           <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1 }}>

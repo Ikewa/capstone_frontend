@@ -17,10 +17,14 @@ import CloseIcon from '@mui/icons-material/Close'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
 import { ToastContext } from '../context/ToastContext'
+import Translate from '../components/Translate'
+import { useTranslate } from '../hooks/useTranslate'
+import { useLanguage } from '../context/LanguageContext'
 
 function AskQuestionPage() {
   const navigate = useNavigate()
-  const { showToast } = useContext(ToastContext)  // FIXED: Moved inside component
+  const { showToast } = useContext(ToastContext)
+  const { translate } = useLanguage()
   
   const [formData, setFormData] = useState({
     title: '',
@@ -32,7 +36,35 @@ function AskQuestionPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  // Common tag suggestions
+  // Translate labels
+  const labels = [
+    'Title',
+    'Be specific and imagine you\'re asking a question to another person',
+    'e.g., How to control armyworm in maize during rainy season?',
+    'minimum characters',
+    'Description',
+    'Include all the information someone would need to answer your question',
+    'Describe your problem in detail. What have you tried? What are the symptoms?',
+    'Image URL (Optional)',
+    'Add an image to help explain your problem',
+    'Tags',
+    'Add up to 5 tags to help others find your question',
+    'Enter a tag and press Enter',
+    'Add',
+    'Suggested Tags:',
+    'Tips for asking a good question:',
+    'Be specific and clear in your title',
+    'Provide context and details in the description',
+    'Include what you\'ve already tried',
+    'Add relevant tags to help others find your question',
+    'Include images if they help explain the problem',
+    'Posting Question...',
+    'Post Your Question',
+    'Cancel'
+  ];
+  const { translated: translatedLabels } = useTranslate(labels);
+
+  // Common tag suggestions - Don't translate (they're standard terms)
   const suggestedTags = [
     'Maize', 'Rice', 'Groundnut', 'Sorghum', 'Cowpea', 'Cassava',
     'Pest Control', 'Irrigation', 'Fertilizer', 'Soil Preparation',
@@ -66,39 +98,45 @@ function AskQuestionPage() {
     const token = localStorage.getItem('token')
     
     if (!token) {
-      showToast('Please login to ask a question', 'error')  // ADDED TOAST
+      const msg = await translate('Please login to ask a question')
+      showToast(msg, 'error')
       navigate('/login')
       return
     }
 
     // Validation
     if (!formData.title.trim()) {
-      setError('Please enter a title')
-      showToast('Please enter a title', 'warning')  // ADDED TOAST
+      const msg = await translate('Please enter a title')
+      setError(msg)
+      showToast(msg, 'warning')
       return
     }
 
     if (formData.title.length < 10) {
-      setError('Title must be at least 10 characters')
-      showToast('Title must be at least 10 characters', 'warning')  // ADDED TOAST
+      const msg = await translate('Title must be at least 10 characters')
+      setError(msg)
+      showToast(msg, 'warning')
       return
     }
 
     if (!formData.description.trim()) {
-      setError('Please enter a description')
-      showToast('Please enter a description', 'warning')  // ADDED TOAST
+      const msg = await translate('Please enter a description')
+      setError(msg)
+      showToast(msg, 'warning')
       return
     }
 
     if (formData.description.length < 20) {
-      setError('Description must be at least 20 characters')
-      showToast('Description must be at least 20 characters', 'warning')  // ADDED TOAST
+      const msg = await translate('Description must be at least 20 characters')
+      setError(msg)
+      showToast(msg, 'warning')
       return
     }
 
     if (tags.length === 0) {
-      setError('Please add at least one tag')
-      showToast('Please add at least one tag', 'warning')  // ADDED TOAST
+      const msg = await translate('Please add at least one tag')
+      setError(msg)
+      showToast(msg, 'warning')
       return
     }
 
@@ -123,8 +161,8 @@ function AskQuestionPage() {
 
       console.log('✅ Question created:', response.data)
 
-      // ADDED: Success toast
-      showToast('✅ Question posted successfully!', 'success')
+      const successMsg = await translate('✅ Question posted successfully!')
+      showToast(successMsg, 'success')
 
       // Navigate to the new question
       navigate(`/questions/${response.data.question_id}`)
@@ -132,14 +170,14 @@ function AskQuestionPage() {
     } catch (err: any) {
       console.error('💥 Error creating question:', err)
       if (err.response?.status === 401 || err.response?.status === 403) {
-        const errorMsg = 'Please login to ask a question'
+        const errorMsg = await translate('Please login to ask a question')
         setError(errorMsg)
-        showToast(errorMsg, 'error')  // ADDED TOAST
+        showToast(errorMsg, 'error')
         setTimeout(() => navigate('/login'), 2000)
       } else {
-        const errorMsg = err.response?.data?.message || 'Failed to create question. Please try again.'
+        const errorMsg = err.response?.data?.message || await translate('Failed to create question. Please try again.')
         setError(errorMsg)
-        showToast(errorMsg, 'error')  // ADDED TOAST
+        showToast(errorMsg, 'error')
       }
     } finally {
       setSubmitting(false)
@@ -158,15 +196,15 @@ function AskQuestionPage() {
             onClick={() => navigate('/home')}
             sx={{ mb: 3 }}
           >
-            Back to Home
+            <Translate text="Back to Home" />
           </Button>
 
           {/* Header */}
           <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main', mb: 1 }}>
-            Ask a Question
+            <Translate text="Ask a Question" />
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-            Get help from farmers and extension officers across Northern Nigeria
+            <Translate text="Get help from farmers and extension officers across Northern Nigeria" />
           </Typography>
 
           {/* Error Alert */}
@@ -184,50 +222,50 @@ function AskQuestionPage() {
                 {/* Title Field */}
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    Title
+                    {translatedLabels[0]}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Be specific and imagine you're asking a question to another person
+                    {translatedLabels[1]}
                   </Typography>
                   <TextField
                     fullWidth
                     name="title"
-                    placeholder="e.g., How to control armyworm in maize during rainy season?"
+                    placeholder={translatedLabels[2]}
                     value={formData.title}
                     onChange={handleChange}
                     required
-                    helperText={`${formData.title.length} / 10 minimum characters`}
+                    helperText={`${formData.title.length} / 10 ${translatedLabels[3]}`}
                   />
                 </Box>
 
                 {/* Description Field */}
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    Description
+                    {translatedLabels[4]}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Include all the information someone would need to answer your question
+                    {translatedLabels[5]}
                   </Typography>
                   <TextField
                     fullWidth
                     multiline
                     rows={8}
                     name="description"
-                    placeholder="Describe your problem in detail. What have you tried? What are the symptoms?"
+                    placeholder={translatedLabels[6]}
                     value={formData.description}
                     onChange={handleChange}
                     required
-                    helperText={`${formData.description.length} / 20 minimum characters`}
+                    helperText={`${formData.description.length} / 20 ${translatedLabels[3]}`}
                   />
                 </Box>
 
                 {/* Image URL Field (Optional) */}
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    Image URL (Optional)
+                    {translatedLabels[7]}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Add an image to help explain your problem
+                    {translatedLabels[8]}
                   </Typography>
                   <TextField
                     fullWidth
@@ -241,10 +279,10 @@ function AskQuestionPage() {
                 {/* Tags Field */}
                 <Box sx={{ mb: 4 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    Tags
+                    {translatedLabels[9]}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Add up to 5 tags to help others find your question
+                    {translatedLabels[10]}
                   </Typography>
 
                   {/* Current Tags */}
@@ -272,7 +310,7 @@ function AskQuestionPage() {
                       <TextField
                         fullWidth
                         size="small"
-                        placeholder="Enter a tag and press Enter"
+                        placeholder={translatedLabels[11]}
                         value={currentTag}
                         onChange={(e) => setCurrentTag(e.target.value)}
                         onKeyPress={(e) => {
@@ -287,14 +325,14 @@ function AskQuestionPage() {
                         onClick={() => handleAddTag(currentTag)}
                         disabled={!currentTag.trim()}
                       >
-                        Add
+                        {translatedLabels[12]}
                       </Button>
                     </Box>
                   )}
 
                   {/* Suggested Tags */}
                   <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold' }}>
-                    Suggested Tags:
+                    {translatedLabels[13]}
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     {suggestedTags
@@ -319,14 +357,14 @@ function AskQuestionPage() {
                 {/* Guidelines */}
                 <Alert severity="info" sx={{ mb: 3 }}>
                   <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    Tips for asking a good question:
+                    {translatedLabels[14]}
                   </Typography>
                   <ul style={{ margin: 0, paddingLeft: 20 }}>
-                    <li>Be specific and clear in your title</li>
-                    <li>Provide context and details in the description</li>
-                    <li>Include what you've already tried</li>
-                    <li>Add relevant tags to help others find your question</li>
-                    <li>Include images if they help explain the problem</li>
+                    <li>{translatedLabels[15]}</li>
+                    <li>{translatedLabels[16]}</li>
+                    <li>{translatedLabels[17]}</li>
+                    <li>{translatedLabels[18]}</li>
+                    <li>{translatedLabels[19]}</li>
                   </ul>
                 </Alert>
 
@@ -345,7 +383,7 @@ function AskQuestionPage() {
                       }
                     }}
                   >
-                    {submitting ? 'Posting Question...' : 'Post Your Question'}
+                    {submitting ? translatedLabels[20] : translatedLabels[21]}
                   </Button>
                   <Button
                     variant="outlined"
@@ -353,7 +391,7 @@ function AskQuestionPage() {
                     onClick={() => navigate('/forum')}
                     disabled={submitting}
                   >
-                    Cancel
+                    {translatedLabels[22]}
                   </Button>
                 </Box>
               </form>

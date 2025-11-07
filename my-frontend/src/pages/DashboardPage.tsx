@@ -23,11 +23,12 @@ import CommentIcon from '@mui/icons-material/Comment'
 import PersonIcon from '@mui/icons-material/Person'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import ChatIcon from '@mui/icons-material/Chat'
-// import EventIcon from '@mui/icons-material/Event'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
 import UniversalSearch from '../components/UniversalSearch'
+import Translate from '../components/Translate'
+import { useTranslate } from '../hooks/useTranslate'
 
 function DashboardPage() {
   const navigate = useNavigate()
@@ -47,33 +48,46 @@ function DashboardPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const discussionsPerPage = 10
 
+  // Translate quick action labels
+  const quickActionLabels = [
+    'Ask Question',
+    'Get help from community',
+    'Crop Advice',
+    'Get recommendations',
+    'Book Officer',
+    'Schedule consultation',
+    'Chat with People',
+    'Get instant help'
+  ];
+  const { translated: translatedActions } = useTranslate(quickActionLabels);
+
   // Quick Actions for left sidebar
   const quickActions = [
-     {
-        icon: <ForumIcon sx={{ fontSize: 40 }} />,
-        title: 'Ask Question',
-        description: 'Get help from community',
-        path: '/ask-question',  // ← Goes directly to ask question page
-        color: '#2e7d32'
+    {
+      icon: <ForumIcon sx={{ fontSize: 40 }} />,
+      title: translatedActions[0] || 'Ask Question',
+      description: translatedActions[1] || 'Get help from community',
+      path: '/ask-question',
+      color: '#2e7d32'
     },
     {
       icon: <AgricultureIcon sx={{ fontSize: 40 }} />,
-      title: 'Crop Advice',
-      description: 'Get recommendations',
+      title: translatedActions[2] || 'Crop Advice',
+      description: translatedActions[3] || 'Get recommendations',
       path: '/crop-recommendations',
       color: '#558b2f'
     },
     {
       icon: <CalendarMonthIcon sx={{ fontSize: 40 }} />,
-      title: 'Book Officer',
-      description: 'Schedule consultation',
+      title: translatedActions[4] || 'Book Officer',
+      description: translatedActions[5] || 'Schedule consultation',
       path: '/my-bookings',
       color: '#689f38'
     },
-     {
+    {
       icon: <ChatIcon sx={{ fontSize: 40 }} />,
-      title: 'Chat with People',
-      description: 'Get instant help',
+      title: translatedActions[6] || 'Chat with People',
+      description: translatedActions[7] || 'Get instant help',
       path: '/chats',
       color: '#689f38'
     },
@@ -313,7 +327,7 @@ function DashboardPage() {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-        <Typography variant="h5">Loading...</Typography>
+        <Typography variant="h5"><Translate text="Loading..." /></Typography>
       </Box>
     )
   }
@@ -324,328 +338,329 @@ function DashboardPage() {
       <Box sx={{ backgroundColor: '#f8f9fa', minHeight: '100vh', py: 4 }}>
         <Container maxWidth="xl">
 
-         {/* Welcome Section */}
-<Box sx={{ mb: 4 }}>
-  {/* Avatar and Welcome Text Row */}
-  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-    <Avatar 
-      sx={{ 
-        width: 80, 
-        height: 80, 
-        bgcolor: 'primary.main',
-        fontSize: '2rem'
-      }}
-    >
-      {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
-    </Avatar>
-    <Box>
-      <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-        Welcome back, {user?.first_name}! 👋
-      </Typography>
-      <Typography variant="body1" color="text.secondary">
-        📍 {user?.location} • Here's what's happening in your farming community
-      </Typography>
-    </Box>
-  </Box>
+          {/* Welcome Section */}
+          <Box sx={{ mb: 4 }}>
+            {/* Avatar and Welcome Text Row */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Avatar 
+                sx={{ 
+                  width: 80, 
+                  height: 80, 
+                  bgcolor: 'primary.main',
+                  fontSize: '2rem'
+                }}
+              >
+                {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
+              </Avatar>
+              <Box>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                  <Translate text="Welcome back" />, {user?.first_name}! 👋
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  📍 {user?.location} • <Translate text="Here's what's happening in your farming community" />
+                </Typography>
+              </Box>
+            </Box>
 
-  {/* Search Bar - MOVED OUTSIDE the flex row */}
-  <Box sx={{ mt: 3, maxWidth: 800, mx: 'auto' }}>
-    <UniversalSearch />
-  </Box>
-</Box>
-        {/* THREE COLUMN LAYOUT */}
-        <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', lg: 'row' } }}>
-          
-          {/* LEFT SIDEBAR - QUICK ACTIONS */}
-          <Box sx={{ width: { xs: '100%', lg: '280px' }, flexShrink: 0 }}>
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                color: 'primary.main', 
-                fontWeight: 'bold', 
-                mb: 3 
-              }}
-            >
-              Quick Actions
-            </Typography>
-            
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {quickActions.map((action, index) => (
-                <Card
-                  key={index}
-                  onClick={() => navigate(action.path)}
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'all 0.3s',
-                    border: '2px solid transparent',
-                    '&:hover': {
-                      transform: 'translateX(5px)',
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                      borderColor: action.color,
-                    }
-                  }}
-                >
-                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
-                    <Box sx={{ color: action.color }}>
-                      {action.icon}
-                    </Box>
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main', lineHeight: 1.2 }}>
-                        {action.title}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
-                        {action.description}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
+            {/* Search Bar - MOVED OUTSIDE the flex row */}
+            <Box sx={{ mt: 3, maxWidth: 800, mx: 'auto' }}>
+              <UniversalSearch />
             </Box>
           </Box>
 
-          {/* CENTER - TRENDING DISCUSSIONS (MAIN CONTENT) */}
-          <Box sx={{ flex: 1 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          {/* THREE COLUMN LAYOUT */}
+          <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', lg: 'row' } }}>
+            
+            {/* LEFT SIDEBAR - QUICK ACTIONS */}
+            <Box sx={{ width: { xs: '100%', lg: '280px' }, flexShrink: 0 }}>
               <Typography 
-                variant="h4" 
+                variant="h5" 
                 sx={{ 
                   color: 'primary.main', 
-                  fontWeight: 'bold',
+                  fontWeight: 'bold', 
+                  mb: 3 
                 }}
               >
-                🔥 Trending Discussions
+                <Translate text="Quick Actions" />
               </Typography>
               
-              {/* Show indicator if using real or mock data */}
-              <Chip 
-                label={discussions.length > 0 ? 'Live Data' : 'Mock Data'} 
-                size="small"
-                color={discussions.length > 0 ? 'success' : 'default'}
-                sx={{ fontWeight: 'bold' }}
-              />
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {quickActions.map((action, index) => (
+                  <Card
+                    key={index}
+                    onClick={() => navigate(action.path)}
+                    sx={{
+                      cursor: 'pointer',
+                      transition: 'all 0.3s',
+                      border: '2px solid transparent',
+                      '&:hover': {
+                        transform: 'translateX(5px)',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                        borderColor: action.color,
+                      }
+                    }}
+                  >
+                    <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
+                      <Box sx={{ color: action.color }}>
+                        {action.icon}
+                      </Box>
+                      <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main', lineHeight: 1.2 }}>
+                          {action.title}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
+                          {action.description}
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Box>
             </Box>
 
-            {discussionsLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                <CircularProgress />
+            {/* CENTER - TRENDING DISCUSSIONS (MAIN CONTENT) */}
+            <Box sx={{ flex: 1 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography 
+                  variant="h4" 
+                  sx={{ 
+                    color: 'primary.main', 
+                    fontWeight: 'bold',
+                  }}
+                >
+                  🔥 <Translate text="Trending Discussions" />
+                </Typography>
+                
+                {/* Show indicator if using real or mock data */}
+                <Chip 
+                  label={discussions.length > 0 ? <Translate text="Live Data" /> : <Translate text="Mock Data" />} 
+                  size="small"
+                  color={discussions.length > 0 ? 'success' : 'default'}
+                  sx={{ fontWeight: 'bold' }}
+                />
               </Box>
-            ) : (
-              <>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4 }}>
-                  {currentDiscussions.map((discussion) => (
-                    <Card
-                      key={discussion.id}
-                      onClick={() => navigate(`/questions/${discussion.id}`)}
-                      sx={{
-                        cursor: 'pointer',
-                        transition: 'all 0.3s',
-                        '&:hover': {
-                          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                          transform: 'translateY(-2px)',
-                        }
-                      }}
-                    >
-                      <CardContent sx={{ p: 3 }}>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                          {/* Vote Section */}
-                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
-                            <IconButton size="small" sx={{ color: 'success.main' }}>
-                              <ThumbUpIcon />
-                            </IconButton>
-                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'success.main' }}>
-                              {discussion.votes || 0}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                              votes
-                            </Typography>
-                          </Box>
 
-                          <Divider orientation="vertical" flexItem />
-
-                          {/* Content Section */}
-                          <Box sx={{ flex: 1 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                              <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-                                <PersonIcon fontSize="small" />
-                              </Avatar>
-                              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                                {discussion.author || 'Anonymous'}
+              {discussionsLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4 }}>
+                    {currentDiscussions.map((discussion) => (
+                      <Card
+                        key={discussion.id}
+                        onClick={() => navigate(`/questions/${discussion.id}`)}
+                        sx={{
+                          cursor: 'pointer',
+                          transition: 'all 0.3s',
+                          '&:hover': {
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                            transform: 'translateY(-2px)',
+                          }
+                        }}
+                      >
+                        <CardContent sx={{ p: 3 }}>
+                          <Box sx={{ display: 'flex', gap: 2 }}>
+                            {/* Vote Section */}
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
+                              <IconButton size="small" sx={{ color: 'success.main' }}>
+                                <ThumbUpIcon />
+                              </IconButton>
+                              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'success.main' }}>
+                                {discussion.votes || 0}
                               </Typography>
-                              <Chip 
-                                label={discussion.role || 'Farmer'} 
-                                size="small" 
-                                sx={{ height: 20, fontSize: '0.7rem' }}
-                              />
                               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                • {discussion.timeAgo || 'Recently'}
+                                <Translate text="votes" />
                               </Typography>
                             </Box>
 
-                            <Typography 
-                              variant="h6" 
-                              sx={{ 
-                                fontWeight: 'bold', 
-                                color: 'primary.main',
-                                mb: 1
-                              }}
-                            >
-                              {discussion.title}
-                            </Typography>
+                            <Divider orientation="vertical" flexItem />
 
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <LocationOnIcon fontSize="small" />
-                              {discussion.location || 'Northern Nigeria'}
-                            </Typography>
-
-                            {discussion.tags && discussion.tags.length > 0 && (
-                              <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-                                {discussion.tags.map((tag: string, idx: number) => (
-                                  <Chip 
-                                    key={idx}
-                                    label={tag} 
-                                    size="small"
-                                    sx={{ 
-                                      backgroundColor: '#e8f5e9',
-                                      fontSize: '0.75rem'
-                                    }}
-                                  />
-                                ))}
-                              </Box>
-                            )}
-
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <CommentIcon fontSize="small" sx={{ color: 'text.secondary' }} />
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                  {discussion.answers || 0} answers
+                            {/* Content Section */}
+                            <Box sx={{ flex: 1 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                                  <PersonIcon fontSize="small" />
+                                </Avatar>
+                                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                  {discussion.author || 'Anonymous'}
+                                </Typography>
+                                <Chip 
+                                  label={discussion.role || 'Farmer'} 
+                                  size="small" 
+                                  sx={{ height: 20, fontSize: '0.7rem' }}
+                                />
+                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                  • {discussion.timeAgo || 'Recently'}
                                 </Typography>
                               </Box>
+
+                              <Typography 
+                                variant="h6" 
+                                sx={{ 
+                                  fontWeight: 'bold', 
+                                  color: 'primary.main',
+                                  mb: 1
+                                }}
+                              >
+                                {discussion.title}
+                              </Typography>
+
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <LocationOnIcon fontSize="small" />
+                                {discussion.location || 'Northern Nigeria'}
+                              </Typography>
+
+                              {discussion.tags && discussion.tags.length > 0 && (
+                                <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                                  {discussion.tags.map((tag: string, idx: number) => (
+                                    <Chip 
+                                      key={idx}
+                                      label={tag} 
+                                      size="small"
+                                      sx={{ 
+                                        backgroundColor: '#e8f5e9',
+                                        fontSize: '0.75rem'
+                                      }}
+                                    />
+                                  ))}
+                                </Box>
+                              )}
+
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <CommentIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+                                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                    {discussion.answers || 0} <Translate text="answers" />
+                                  </Typography>
+                                </Box>
+                              </Box>
                             </Box>
                           </Box>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </Box>
-
-                {/* PAGINATION */}
-                {totalPages > 1 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                    <Pagination 
-                      count={totalPages} 
-                      page={currentPage} 
-                      onChange={handlePageChange}
-                      color="primary"
-                      size="large"
-                      showFirstButton 
-                      showLastButton
-                    />
+                        </CardContent>
+                      </Card>
+                    ))}
                   </Box>
-                )}
-              </>
-            )}
-          </Box>
 
-          {/* RIGHT SIDEBAR - UPCOMING EVENTS (COMPACT SNIPPETS) */}
-          <Box sx={{ width: { xs: '100%', lg: '300px' }, flexShrink: 0 }}>
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                color: 'primary.main', 
-                fontWeight: 'bold', 
-                mb: 3 
-              }}
-            >
-              📅 Upcoming Events
-            </Typography>
-            
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {upcomingEvents.map((event) => (
-                <Card
-                  key={event.id}
+                  {/* PAGINATION */}
+                  {totalPages > 1 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                      <Pagination 
+                        count={totalPages} 
+                        page={currentPage} 
+                        onChange={handlePageChange}
+                        color="primary"
+                        size="large"
+                        showFirstButton 
+                        showLastButton
+                      />
+                    </Box>
+                  )}
+                </>
+              )}
+            </Box>
+
+            {/* RIGHT SIDEBAR - UPCOMING EVENTS (COMPACT SNIPPETS) */}
+            <Box sx={{ width: { xs: '100%', lg: '300px' }, flexShrink: 0 }}>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  color: 'primary.main', 
+                  fontWeight: 'bold', 
+                  mb: 3 
+                }}
+              >
+                📅 <Translate text="Upcoming Events" />
+              </Typography>
+              
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {upcomingEvents.map((event) => (
+                  <Card
+                    key={event.id}
+                    onClick={() => navigate('/events')}
+                    sx={{
+                      cursor: 'pointer',
+                      transition: 'all 0.3s',
+                      '&:hover': {
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                        transform: 'translateY(-3px)',
+                      }
+                    }}
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+                        <Box 
+                          sx={{ 
+                            bgcolor: 'secondary.main', 
+                            color: 'white', 
+                            borderRadius: 1, 
+                            p: 1,
+                            minWidth: 50,
+                            textAlign: 'center'
+                          }}
+                        >
+                          <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.75rem' }}>
+                            {event.date}
+                          </Typography>
+                        </Box>
+                        
+                        <Box sx={{ flex: 1 }}>
+                          <Typography 
+                            variant="body1" 
+                            sx={{ 
+                              fontWeight: 'bold', 
+                              color: 'primary.main',
+                              fontSize: '0.9rem',
+                              lineHeight: 1.3,
+                              mb: 0.5
+                            }}
+                          >
+                            {event.title}
+                          </Typography>
+                          
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <LocationOnIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                              {event.location}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Box>
+
+              {/* View All Events Link */}
+              <Box sx={{ mt: 3, textAlign: 'center' }}>
+                <Link
                   onClick={() => navigate('/events')}
                   sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 1,
+                    color: 'primary.main',
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
                     cursor: 'pointer',
-                    transition: 'all 0.3s',
                     '&:hover': {
-                      boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                      transform: 'translateY(-3px)',
+                      textDecoration: 'underline',
                     }
                   }}
                 >
-                  <CardContent sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
-                      <Box 
-                        sx={{ 
-                          bgcolor: 'secondary.main', 
-                          color: 'white', 
-                          borderRadius: 1, 
-                          p: 1,
-                          minWidth: 50,
-                          textAlign: 'center'
-                        }}
-                      >
-                        <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.75rem' }}>
-                          {event.date}
-                        </Typography>
-                      </Box>
-                      
-                      <Box sx={{ flex: 1 }}>
-                        <Typography 
-                          variant="body1" 
-                          sx={{ 
-                            fontWeight: 'bold', 
-                            color: 'primary.main',
-                            fontSize: '0.9rem',
-                            lineHeight: 1.3,
-                            mb: 0.5
-                          }}
-                        >
-                          {event.title}
-                        </Typography>
-                        
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <LocationOnIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                          <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                            {event.location}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
+                  <Translate text="View All Events" />
+                  <ArrowForwardIcon fontSize="small" />
+                </Link>
+              </Box>
             </Box>
 
-            {/* View All Events Link */}
-            <Box sx={{ mt: 3, textAlign: 'center' }}>
-              <Link
-                onClick={() => navigate('/events')}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 1,
-                  color: 'primary.main',
-                  fontWeight: 'bold',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    textDecoration: 'underline',
-                  }
-                }}
-              >
-                View All Events
-                <ArrowForwardIcon fontSize="small" />
-              </Link>
-            </Box>
           </Box>
 
-        </Box>
-
-      </Container>
-    </Box>
-</>
+        </Container>
+      </Box>
+    </>
   )
 }
 

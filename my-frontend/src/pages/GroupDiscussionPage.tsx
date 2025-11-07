@@ -38,17 +38,21 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-// import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { ToastContext } from '../context/ToastContext';
 import { useSocket } from '../context/SocketContext';
+import Translate from '../components/Translate';
+import { useTranslate } from '../hooks/useTranslate';
+import { useLanguage } from '../context/LanguageContext';
+import NotesButton from '../components/NotesButton';
 
 const GroupDiscussionPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showToast } = useContext(ToastContext);
   const { socket } = useSocket();
+  const { translate } = useLanguage();
 
   const [group, setGroup] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -81,87 +85,119 @@ const GroupDiscussionPage = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
- useEffect(() => {
-  // Get current user ID
-  const token = localStorage.getItem('token');
-  if (token) {
-    const userData = JSON.parse(atob(token.split('.')[1]));
-    setCurrentUserId(userData.id);
-  }
+  // Translate labels
+  const labels = [
+    'members',
+    'No messages yet',
+    'Be the first to start the discussion!',
+    'Type your message...',
+    'Replying to',
+    'Cancel',
+    'Reply',
+    'Delete Message',
+    'Members',
+    'messages',
+    'Admin',
+    'Make Admin',
+    'Group Settings',
+    'Edit Group Details',
+    'Leave Group',
+    'Delete Group',
+    'Edit Group',
+    'Group Name',
+    'Description',
+    'Save Changes',
+    'Group not found',
+    'Just now',
+    'ago'
+  ];
+  const { translated: translatedLabels } = useTranslate(labels);
 
-  fetchGroupData();
+  // Translate time units
+  const timeUnits = ['m', 'h', 'd'];
+  const { translated: translatedTime } = useTranslate(timeUnits);
 
-  // Join group room via socket
-  if (socket && id) {
-    console.log(`🔌 Joining group ${id} room`);
-    socket.emit('join_group', id);
-  }
+  useEffect(() => {
+    // Get current user ID
+    const token = localStorage.getItem('token');
+    if (token) {
+      const userData = JSON.parse(atob(token.split('.')[1]));
+      setCurrentUserId(userData.id);
+    }
 
-  // Setup socket listeners
-  if (socket) {
-    // New message received
-    socket.on('new_group_message', (message: any) => {
-      console.log('📨 New group message received:', message);
-      // Only add if not already in messages (avoid duplicates)
-      setMessages(prev => {
-        if (prev.some(m => m.id === message.id)) {
-          return prev;
-        }
-        return [...prev, message];
-      });
-      scrollToBottom();
-    });
+    fetchGroupData();
 
-    // Message reaction updated
-    socket.on('message_reaction', (data: any) => {
-      console.log('👍 Message reaction:', data);
-      setMessages(prev =>
-        prev.map(msg => {
-          if (msg.id === data.message_id) {
-            const newCount = data.action === 'added' 
-              ? msg.reaction_count + 1 
-              : msg.reaction_count - 1;
-            return {
-              ...msg,
-              reaction_count: Math.max(0, newCount)
-            };
-          }
-          return msg;
-        })
-      );
-    });
-
-    // Someone is typing
-    socket.on('user_typing_in_group', (data: any) => {
-      if (data.user_id !== currentUserId) {
-        console.log('⌨️ User typing:', data.user_name);
-        // You can show a typing indicator here
-      }
-    });
-
-    // Someone stopped typing
-    socket.on('user_stop_typing_in_group', (data: any) => {
-      console.log('⌨️ User stopped typing');
-      // Hide typing indicator
-    });
-  }
-
-  return () => {
-    // Leave group room when component unmounts
+    // Join group room via socket
     if (socket && id) {
-      console.log(`👋 Leaving group ${id} room`);
-      socket.emit('leave_group', id);
+      console.log(`🔌 Joining group ${id} room`);
+      socket.emit('join_group', id);
     }
 
-    // Clean up listeners
+    // Setup socket listeners
     if (socket) {
-      socket.off('new_group_message');
-      socket.off('message_reaction');
-      socket.off('user_typing_in_group');
-      socket.off('user_stop_typing_in_group');
+      // New message received
+      socket.on('new_group_message', (message: any) => {
+        console.log('📨 New group message received:', message);
+        // Only add if not already in messages (avoid duplicates)
+        setMessages(prev => {
+          if (prev.some(m => m.id === message.id)) {
+            return prev;
+          }
+          return [...prev, message];
+        });
+        scrollToBottom();
+      });
+
+      // Message reaction updated
+      socket.on('message_reaction', (data: any) => {
+        console.log('👍 Message reaction:', data);
+        setMessages(prev =>
+          prev.map(msg => {
+            if (msg.id === data.message_id) {
+              const newCount = data.action === 'added' 
+                ? msg.reaction_count + 1 
+                : msg.reaction_count - 1;
+              return {
+                ...msg,
+                reaction_count: Math.max(0, newCount)
+              };
+            }
+            return msg;
+          })
+        );
+      });
+
+      // Someone is typing
+      socket.on('user_typing_in_group', (data: any) => {
+        if (data.user_id !== currentUserId) {
+          console.log('⌨️ User typing:', data.user_name);
+          // You can show a typing indicator here
+        }
+      });
+
+      // Someone stopped typing
+      socket.on('user_stop_typing_in_group', (data: any) => {
+        console.log('⌨️ User stopped typing');
+        // Hide typing indicator
+      });
     }
-  };
-}, [id, socket, currentUserId]);
+
+    return () => {
+      // Leave group room when component unmounts
+      if (socket && id) {
+        console.log(`👋 Leaving group ${id} room`);
+        socket.emit('leave_group', id);
+      }
+
+      // Clean up listeners
+      if (socket) {
+        socket.off('new_group_message');
+        socket.off('message_reaction');
+        socket.off('user_typing_in_group');
+        socket.off('user_stop_typing_in_group');
+      }
+    };
+  }, [id, socket, currentUserId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -261,7 +297,8 @@ const GroupDiscussionPage = () => {
       scrollToBottom();
     } catch (err: any) {
       console.error('❌ Error sending message:', err);
-      showToast(err.response?.data?.message || 'Failed to send message', 'error');
+      const errorMsg = err.response?.data?.message || await translate('Failed to send message');
+      showToast(errorMsg, 'error');
     } finally {
       setSending(false);
     }
@@ -306,12 +343,14 @@ const GroupDiscussionPage = () => {
       }
     } catch (err) {
       console.error('❌ Error reacting:', err);
-      showToast('Failed to react to message', 'error');
+      const errorMsg = await translate('Failed to react to message');
+      showToast(errorMsg, 'error');
     }
   };
 
   const handleDeleteMessage = async (messageId: number) => {
-    if (!window.confirm('Are you sure you want to delete this message?')) return;
+    const confirmMsg = await translate('Are you sure you want to delete this message?');
+    if (!window.confirm(confirmMsg)) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -321,17 +360,20 @@ const GroupDiscussionPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      showToast('Message deleted', 'success');
+      const successMsg = await translate('Message deleted');
+      showToast(successMsg, 'success');
       setMessages(prev => prev.filter(msg => msg.id !== messageId && msg.parent_message_id !== messageId));
       setMessageMenuAnchor(null);
     } catch (err: any) {
       console.error('❌ Error deleting message:', err);
-      showToast(err.response?.data?.message || 'Failed to delete message', 'error');
+      const errorMsg = err.response?.data?.message || await translate('Failed to delete message');
+      showToast(errorMsg, 'error');
     }
   };
 
   const handleLeaveGroup = async () => {
-    if (!window.confirm('Are you sure you want to leave this group?')) return;
+    const confirmMsg = await translate('Are you sure you want to leave this group?');
+    if (!window.confirm(confirmMsg)) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -342,16 +384,19 @@ const GroupDiscussionPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      showToast('Left group successfully', 'success');
+      const successMsg = await translate('Left group successfully');
+      showToast(successMsg, 'success');
       navigate('/discussion-groups');
     } catch (err: any) {
       console.error('❌ Error leaving group:', err);
-      showToast(err.response?.data?.message || 'Failed to leave group', 'error');
+      const errorMsg = err.response?.data?.message || await translate('Failed to leave group');
+      showToast(errorMsg, 'error');
     }
   };
 
   const handleDeleteGroup = async () => {
-    if (!window.confirm('Are you sure you want to delete this group? This action cannot be undone.')) return;
+    const confirmMsg = await translate('Are you sure you want to delete this group? This action cannot be undone.');
+    if (!window.confirm(confirmMsg)) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -361,11 +406,13 @@ const GroupDiscussionPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      showToast('Group deleted successfully', 'success');
+      const successMsg = await translate('Group deleted successfully');
+      showToast(successMsg, 'success');
       navigate('/discussion-groups');
     } catch (err: any) {
       console.error('❌ Error deleting group:', err);
-      showToast(err.response?.data?.message || 'Failed to delete group', 'error');
+      const errorMsg = err.response?.data?.message || await translate('Failed to delete group');
+      showToast(errorMsg, 'error');
     }
   };
 
@@ -379,17 +426,20 @@ const GroupDiscussionPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      showToast('Group updated successfully', 'success');
+      const successMsg = await translate('Group updated successfully');
+      showToast(successMsg, 'success');
       setEditDialogOpen(false);
       fetchGroup();
     } catch (err: any) {
       console.error('❌ Error updating group:', err);
-      showToast(err.response?.data?.message || 'Failed to update group', 'error');
+      const errorMsg = err.response?.data?.message || await translate('Failed to update group');
+      showToast(errorMsg, 'error');
     }
   };
 
   const handleRemoveMember = async (memberId: number) => {
-    if (!window.confirm('Are you sure you want to remove this member?')) return;
+    const confirmMsg = await translate('Are you sure you want to remove this member?');
+    if (!window.confirm(confirmMsg)) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -399,11 +449,13 @@ const GroupDiscussionPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      showToast('Member removed', 'success');
+      const successMsg = await translate('Member removed');
+      showToast(successMsg, 'success');
       fetchMembers();
     } catch (err: any) {
       console.error('❌ Error removing member:', err);
-      showToast(err.response?.data?.message || 'Failed to remove member', 'error');
+      const errorMsg = err.response?.data?.message || await translate('Failed to remove member');
+      showToast(errorMsg, 'error');
     }
   };
 
@@ -417,11 +469,13 @@ const GroupDiscussionPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      showToast('Member promoted to admin', 'success');
+      const successMsg = await translate('Member promoted to admin');
+      showToast(successMsg, 'success');
       fetchMembers();
     } catch (err: any) {
       console.error('❌ Error making admin:', err);
-      showToast(err.response?.data?.message || 'Failed to promote member', 'error');
+      const errorMsg = err.response?.data?.message || await translate('Failed to promote member');
+      showToast(errorMsg, 'error');
     }
   };
 
@@ -433,11 +487,11 @@ const GroupDiscussionPage = () => {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
+    if (minutes < 1) return translatedLabels[21] || 'Just now';
+    if (minutes < 60) return `${minutes}${translatedTime[0] || 'm'} ${translatedLabels[22] || 'ago'}`;
+    if (hours < 24) return `${hours}${translatedTime[1] || 'h'} ${translatedLabels[22] || 'ago'}`;
     if (days === 0) return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    if (days < 7) return `${days}d ago`;
+    if (days < 7) return `${days}${translatedTime[2] || 'd'} ${translatedLabels[22] || 'ago'}`;
     return date.toLocaleDateString();
   };
 
@@ -499,7 +553,7 @@ const GroupDiscussionPage = () => {
               )}
             </Box>
 
-            {/* Message Content */}
+            {/* Message Content - Don't translate user messages */}
             <Typography variant="body1" sx={{ mb: 1, whiteSpace: 'pre-wrap' }}>
               {message.content}
             </Typography>
@@ -519,7 +573,7 @@ const GroupDiscussionPage = () => {
                 startIcon={<ReplyIcon />}
                 onClick={() => setReplyingTo(message)}
               >
-                Reply {replies.length > 0 && `(${replies.length})`}
+                {translatedLabels[6]} {replies.length > 0 && `(${replies.length})`}
               </Button>
             </Box>
           </Box>
@@ -553,7 +607,7 @@ const GroupDiscussionPage = () => {
       <>
         <Navbar />
         <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Alert severity="error">{error || 'Group not found'}</Alert>
+          <Alert severity="error">{error || translatedLabels[20]}</Alert>
         </Container>
       </>
     );
@@ -580,7 +634,7 @@ const GroupDiscussionPage = () => {
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                   <Chip label={group.topic} size="small" />
                   <Typography variant="caption" color="text.secondary">
-                    {group.member_count} members
+                    {group.member_count} {translatedLabels[0]}
                   </Typography>
                 </Box>
               </Box>
@@ -601,10 +655,10 @@ const GroupDiscussionPage = () => {
           {topLevelMessages.length === 0 ? (
             <Card sx={{ textAlign: 'center', py: 6 }}>
               <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                No messages yet
+                {translatedLabels[1]}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Be the first to start the discussion!
+                {translatedLabels[2]}
               </Typography>
             </Card>
           ) : (
@@ -631,10 +685,10 @@ const GroupDiscussionPage = () => {
             {replyingTo && (
               <Box sx={{ mb: 1, p: 1, bgcolor: '#f5f5f5', borderRadius: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
-                  Replying to {replyingTo.first_name} {replyingTo.last_name}
+                  {translatedLabels[4]} {replyingTo.first_name} {replyingTo.last_name}
                 </Typography>
                 <Button size="small" onClick={() => setReplyingTo(null)}>
-                  Cancel
+                  {translatedLabels[5]}
                 </Button>
               </Box>
             )}
@@ -644,7 +698,7 @@ const GroupDiscussionPage = () => {
                   fullWidth
                   multiline
                   maxRows={4}
-                  placeholder="Type your message..."
+                  placeholder={translatedLabels[3]}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   disabled={sending}
@@ -675,7 +729,7 @@ const GroupDiscussionPage = () => {
         >
           <MenuItem onClick={() => handleDeleteMessage(selectedMessage?.id)}>
             <DeleteIcon sx={{ mr: 1 }} fontSize="small" />
-            Delete Message
+            {translatedLabels[7]}
           </MenuItem>
         </Menu>
 
@@ -687,7 +741,7 @@ const GroupDiscussionPage = () => {
         >
           <Box sx={{ width: 350, p: 2 }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Members ({members.length})
+              {translatedLabels[8]} ({members.length})
             </Typography>
             <List>
               {members.map((member) => (
@@ -716,18 +770,18 @@ const GroupDiscussionPage = () => {
                           {member.first_name} {member.last_name}
                         </Typography>
                         {member.is_admin && (
-                          <Chip label="Admin" size="small" color="primary" sx={{ height: 18 }} />
+                          <Chip label={translatedLabels[10]} size="small" color="primary" sx={{ height: 18 }} />
                         )}
                       </Box>
                     }
-                    secondary={`${member.message_count} messages`}
+                    secondary={`${member.message_count} ${translatedLabels[9]}`}
                   />
                   {group.is_admin && member.user_id !== currentUserId && !member.is_admin && (
                     <Button
                       size="small"
                       onClick={() => handleMakeAdmin(member.user_id)}
                     >
-                      Make Admin
+                      {translatedLabels[11]}
                     </Button>
                   )}
                 </ListItem>
@@ -744,7 +798,7 @@ const GroupDiscussionPage = () => {
         >
           <Box sx={{ width: 350, p: 2 }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Group Settings
+              {translatedLabels[12]}
             </Typography>
             <List>
               <ListItemButton onClick={() => {
@@ -752,16 +806,16 @@ const GroupDiscussionPage = () => {
                 setEditDialogOpen(true);
               }}>
                 <EditIcon sx={{ mr: 2 }} />
-                <ListItemText primary="Edit Group Details" />
+                <ListItemText primary={translatedLabels[13]} />
               </ListItemButton>
               <ListItemButton onClick={handleLeaveGroup}>
                 <ExitToAppIcon sx={{ mr: 2 }} />
-                <ListItemText primary="Leave Group" />
+                <ListItemText primary={translatedLabels[14]} />
               </ListItemButton>
               {group.is_admin && (
                 <ListItemButton onClick={handleDeleteGroup} sx={{ color: 'error.main' }}>
                   <DeleteIcon sx={{ mr: 2 }} />
-                  <ListItemText primary="Delete Group" />
+                  <ListItemText primary={translatedLabels[15]} />
                 </ListItemButton>
               )}
             </List>
@@ -770,17 +824,17 @@ const GroupDiscussionPage = () => {
 
         {/* Edit Group Dialog */}
         <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>Edit Group</DialogTitle>
+          <DialogTitle>{translatedLabels[16]}</DialogTitle>
           <DialogContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
               <TextField
-                label="Group Name"
+                label={translatedLabels[17]}
                 fullWidth
                 value={editedGroup.name}
                 onChange={(e) => setEditedGroup({ ...editedGroup, name: e.target.value })}
               />
               <TextField
-                label="Description"
+                label={translatedLabels[18]}
                 fullWidth
                 multiline
                 rows={3}
@@ -790,13 +844,28 @@ const GroupDiscussionPage = () => {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+            <Button onClick={() => setEditDialogOpen(false)}>{translatedLabels[5]}</Button>
             <Button variant="contained" onClick={handleUpdateGroup}>
-              Save Changes
+              {translatedLabels[19]}
             </Button>
           </DialogActions>
         </Dialog>
       </Box>
+      {(() => {
+      console.log('🔍 Debug NotesButton:', { 
+        hasGroup: !!group, 
+        id: id,
+        groupName: group?.name,
+        parsedId: id ? parseInt(id) : null
+      });
+      
+      return group && id && group.name ? (
+        <NotesButton 
+          groupId={parseInt(id)}
+          groupName={group.name}
+        />
+      ) : null;
+    })()}
     </>
   );
 };

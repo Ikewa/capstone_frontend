@@ -25,23 +25,9 @@ import SendIcon from '@mui/icons-material/Send'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
 import { ToastContext } from '../context/ToastContext'
-
-// Helper function to calculate time ago
-function timeAgo(dateString: string) {
-  const date = new Date(dateString)
-  const now = new Date()
-  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-
-  if (seconds < 60) return 'just now'
-  const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`
-  const days = Math.floor(hours / 24)
-  if (days < 30) return `${days} day${days > 1 ? 's' : ''} ago`
-  const months = Math.floor(days / 30)
-  return `${months} month${months > 1 ? 's' : ''} ago`
-}
+import Translate from '../components/Translate'
+import { useTranslate } from '../hooks/useTranslate'
+import { useLanguage } from '../context/LanguageContext'
 
 interface Answer {
   id: number
@@ -75,6 +61,7 @@ function QuestionDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { showToast } = useContext(ToastContext)
+  const { translate } = useLanguage()
   
   const [question, setQuestion] = useState<Question | null>(null)
   const [loading, setLoading] = useState(true)
@@ -82,6 +69,51 @@ function QuestionDetailPage() {
   const [answerContent, setAnswerContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+
+  // Translate labels
+  const labels = [
+    'views',
+    'Asked',
+    'Answer',
+    'Answers',
+    'Answered',
+    'Accept this answer',
+    'Accepted',
+    'No answers yet. Be the first to help!',
+    'Your Answer',
+    'Share your knowledge and help the community...',
+    'Posting...',
+    'Post Answer',
+    'Question not found',
+    'just now',
+    'minute',
+    'minutes',
+    'hour',
+    'hours',
+    'day',
+    'days',
+    'month',
+    'months',
+    'ago'
+  ];
+  const { translated: translatedLabels } = useTranslate(labels);
+
+  // Helper function to calculate time ago with translations
+  const timeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+    if (seconds < 60) return translatedLabels[13] || 'just now'
+    const minutes = Math.floor(seconds / 60)
+    if (minutes < 60) return `${minutes} ${minutes > 1 ? translatedLabels[15] : translatedLabels[14]} ${translatedLabels[22]}`
+    const hours = Math.floor(minutes / 60)
+    if (hours < 24) return `${hours} ${hours > 1 ? translatedLabels[17] : translatedLabels[16]} ${translatedLabels[22]}`
+    const days = Math.floor(hours / 24)
+    if (days < 30) return `${days} ${days > 1 ? translatedLabels[19] : translatedLabels[18]} ${translatedLabels[22]}`
+    const months = Math.floor(days / 30)
+    return `${months} ${months > 1 ? translatedLabels[21] : translatedLabels[20]} ${translatedLabels[22]}`
+  }
 
   // Get current user info
   useEffect(() => {
@@ -126,7 +158,8 @@ function QuestionDetailPage() {
       const token = localStorage.getItem('token')
       
       if (!token) {
-        showToast('Please login to vote', 'warning')
+        const msg = await translate('Please login to vote')
+        showToast(msg, 'warning')
         navigate('/login')
         return
       }
@@ -143,16 +176,19 @@ function QuestionDetailPage() {
         }
       )
 
-      showToast(`Vote ${voteType === 'up' ? '👍' : '👎'} recorded!`, 'success')
+      const successMsg = await translate(voteType === 'up' ? 'Vote 👍 recorded!' : 'Vote 👎 recorded!')
+      showToast(successMsg, 'success')
       fetchQuestion()
 
     } catch (err: any) {
       console.error('💥 Vote error:', err)
       if (err.response?.status === 401 || err.response?.status === 403) {
-        showToast('Please login to vote', 'warning')
+        const msg = await translate('Please login to vote')
+        showToast(msg, 'warning')
         navigate('/login')
       } else {
-        showToast('Failed to record vote', 'error')
+        const msg = await translate('Failed to record vote')
+        showToast(msg, 'error')
       }
     }
   }
@@ -163,7 +199,8 @@ function QuestionDetailPage() {
       const token = localStorage.getItem('token')
       
       if (!token) {
-        showToast('Please login to vote', 'warning')
+        const msg = await translate('Please login to vote')
+        showToast(msg, 'warning')
         navigate('/login')
         return
       }
@@ -180,16 +217,19 @@ function QuestionDetailPage() {
         }
       )
 
-      showToast(`Vote ${voteType === 'up' ? '👍' : '👎'} recorded!`, 'success')
+      const successMsg = await translate(voteType === 'up' ? 'Vote 👍 recorded!' : 'Vote 👎 recorded!')
+      showToast(successMsg, 'success')
       fetchQuestion()
 
     } catch (err: any) {
       console.error('💥 Vote error:', err)
       if (err.response?.status === 401 || err.response?.status === 403) {
-        showToast('Please login to vote', 'warning')
+        const msg = await translate('Please login to vote')
+        showToast(msg, 'warning')
         navigate('/login')
       } else {
-        showToast('Failed to record vote', 'error')
+        const msg = await translate('Failed to record vote')
+        showToast(msg, 'error')
       }
     }
   }
@@ -200,7 +240,8 @@ function QuestionDetailPage() {
       const token = localStorage.getItem('token')
       
       if (!token) {
-        showToast('Please login to accept answers', 'warning')
+        const msg = await translate('Please login to accept answers')
+        showToast(msg, 'warning')
         navigate('/login')
         return
       }
@@ -213,15 +254,18 @@ function QuestionDetailPage() {
         }
       )
 
-      showToast('Answer accepted! ✅', 'success')
+      const successMsg = await translate('Answer accepted! ✅')
+      showToast(successMsg, 'success')
       fetchQuestion()
 
     } catch (err: any) {
       console.error('💥 Accept answer error:', err)
       if (err.response?.status === 403) {
-        showToast('Only the question author can accept answers', 'error')
+        const msg = await translate('Only the question author can accept answers')
+        showToast(msg, 'error')
       } else {
-        showToast('Failed to accept answer', 'error')
+        const msg = await translate('Failed to accept answer')
+        showToast(msg, 'error')
       }
     }
   }
@@ -233,13 +277,15 @@ function QuestionDetailPage() {
     const token = localStorage.getItem('token')
     
     if (!token) {
-      showToast('Please login to answer', 'warning')
+      const msg = await translate('Please login to answer')
+      showToast(msg, 'warning')
       navigate('/login')
       return
     }
 
     if (!answerContent.trim()) {
-      showToast('Please enter an answer', 'warning')
+      const msg = await translate('Please enter an answer')
+      showToast(msg, 'warning')
       return
     }
 
@@ -257,13 +303,15 @@ function QuestionDetailPage() {
         }
       )
 
-      showToast('Answer posted successfully! 🎉', 'success')
+      const successMsg = await translate('Answer posted successfully! 🎉')
+      showToast(successMsg, 'success')
       setAnswerContent('')
       fetchQuestion()
 
     } catch (err: any) {
       console.error('💥 Submit answer error:', err)
-      showToast('Failed to submit answer. Please try again.', 'error')
+      const errorMsg = await translate('Failed to submit answer. Please try again.')
+      showToast(errorMsg, 'error')
     } finally {
       setSubmitting(false)
     }
@@ -281,10 +329,10 @@ function QuestionDetailPage() {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="error" sx={{ mb: 3 }}>
-          {error || 'Question not found'}
+          {error || translatedLabels[12]}
         </Alert>
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/home')}>
-          Back to Home
+          <Translate text="Back to Home" />
         </Button>
       </Container>
     )
@@ -302,7 +350,7 @@ function QuestionDetailPage() {
             onClick={() => navigate('/home')}
             sx={{ mb: 3 }}
           >
-            Back to Home
+            <Translate text="Back to Home" />
           </Button>
 
           {/* Question Card */}
@@ -357,7 +405,7 @@ function QuestionDetailPage() {
                   </IconButton>
 
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 2 }}>
-                    👁️ {question.views} views
+                    👁️ {question.views} {translatedLabels[0]}
                   </Typography>
                 </Box>
 
@@ -365,7 +413,7 @@ function QuestionDetailPage() {
 
                 {/* Question Content */}
                 <Box sx={{ flex: 1 }}>
-                  {/* Title */}
+                  {/* Title - Don't translate (user content) */}
                   <Typography 
                     variant="h4" 
                     sx={{ 
@@ -403,7 +451,7 @@ function QuestionDetailPage() {
                             {question.first_name} {question.last_name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Asked {timeAgo(question.created_at)}
+                          {translatedLabels[1]} {timeAgo(question.created_at)}
                         </Typography>
                       </Box>
                     </Box>
@@ -416,7 +464,7 @@ function QuestionDetailPage() {
                     </Box>
                   </Box>
 
-                  {/* Description */}
+                  {/* Description - Don't translate (user content) */}
                   <Typography 
                     variant="body1" 
                     sx={{ 
@@ -443,7 +491,7 @@ function QuestionDetailPage() {
                     />
                   )}
 
-                  {/* Tags */}
+                  {/* Tags - Don't translate (user content) */}
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     {question.tags?.map((tag: string) => (
                       <Chip 
@@ -464,7 +512,7 @@ function QuestionDetailPage() {
 
           {/* Answers Section */}
           <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
-            {question.answers?.length || 0} Answer{question.answers?.length !== 1 ? 's' : ''}
+            {question.answers?.length || 0} {question.answers?.length === 1 ? translatedLabels[2] : translatedLabels[3]}
           </Typography>
 
           {/* Answers List */}
@@ -528,7 +576,7 @@ function QuestionDetailPage() {
                             backgroundColor: '#e8f5e9'
                           }
                         }}
-                        title="Accept this answer"
+                        title={translatedLabels[5]}
                       >
                         <CheckCircleIcon />
                       </IconButton>
@@ -538,7 +586,7 @@ function QuestionDetailPage() {
                     {answer.is_accepted && (
                       <Chip 
                         icon={<CheckCircleIcon />}
-                        label="Accepted"
+                        label={translatedLabels[6]}
                         size="small"
                         sx={{ 
                           mt: 2,
@@ -579,12 +627,12 @@ function QuestionDetailPage() {
                             {answer.first_name} {answer.last_name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Answered {timeAgo(answer.created_at)}
+                          {translatedLabels[4]} {timeAgo(answer.created_at)}
                         </Typography>
                       </Box>
                     </Box>
 
-                    {/* Content */}
+                    {/* Content - Don't translate (user content) */}
                     <Typography 
                       variant="body1" 
                       sx={{ 
@@ -619,7 +667,7 @@ function QuestionDetailPage() {
           {(!question.answers || question.answers.length === 0) && (
             <Card sx={{ textAlign: 'center', py: 4, mb: 3 }}>
               <Typography variant="body1" color="text.secondary">
-                No answers yet. Be the first to help!
+                {translatedLabels[7]}
               </Typography>
             </Card>
           )}
@@ -628,7 +676,7 @@ function QuestionDetailPage() {
           <Card>
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-                Your Answer
+                {translatedLabels[8]}
               </Typography>
               
               <form onSubmit={handleSubmitAnswer}>
@@ -636,7 +684,7 @@ function QuestionDetailPage() {
                   fullWidth
                   multiline
                   rows={6}
-                  placeholder="Share your knowledge and help the community..."
+                  placeholder={translatedLabels[9]}
                   value={answerContent}
                   onChange={(e) => setAnswerContent(e.target.value)}
                   sx={{ mb: 2 }}
@@ -655,7 +703,7 @@ function QuestionDetailPage() {
                     }
                   }}
                 >
-                  {submitting ? 'Posting...' : 'Post Answer'}
+                  {submitting ? translatedLabels[10] : translatedLabels[11]}
                 </Button>
               </form>
             </CardContent>

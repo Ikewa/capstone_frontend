@@ -34,10 +34,14 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { ToastContext } from '../context/ToastContext';
+import Translate from '../components/Translate';
+import { useTranslate } from '../hooks/useTranslate';
+import { useLanguage } from '../context/LanguageContext';
 
 const DiscussionGroupsPage = () => {
   const navigate = useNavigate();
   const { showToast } = useContext(ToastContext);
+  const { translate } = useLanguage();
 
   const [groups, setGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +62,30 @@ const DiscussionGroupsPage = () => {
   });
 
   const [userRole, setUserRole] = useState('');
+
+  // Translate labels
+  const labels = [
+    'All Topics',
+    'All Locations',
+    'Search groups by name or description...',
+    'group',
+    'groups',
+    'found',
+    'member',
+    'members',
+    'message',
+    'messages',
+    'Just now',
+    'ago',
+    'No activity yet',
+    'Last message by',
+    'Created by'
+  ];
+  const { translated: translatedLabels } = useTranslate(labels);
+
+  // Translate time units
+  const timeUnits = ['m', 'h', 'd'];
+  const { translated: translatedTimeUnits } = useTranslate(timeUnits);
 
   useEffect(() => {
     // Get user role
@@ -101,7 +129,8 @@ const DiscussionGroupsPage = () => {
 
   const handleCreateGroup = async () => {
     if (!newGroup.name || !newGroup.topic) {
-      showToast('Please fill in required fields', 'error');
+      const msg = await translate('Please fill in required fields');
+      showToast(msg, 'error');
       return;
     }
 
@@ -116,7 +145,8 @@ const DiscussionGroupsPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      showToast('Group created successfully', 'success');
+      const successMsg = await translate('Group created successfully');
+      showToast(successMsg, 'success');
       setCreateDialogOpen(false);
       setNewGroup({
         name: '',
@@ -128,14 +158,15 @@ const DiscussionGroupsPage = () => {
       fetchGroups();
     } catch (err: any) {
       console.error('❌ Error creating group:', err);
-      showToast(err.response?.data?.message || 'Failed to create group', 'error');
+      const errorMsg = err.response?.data?.message || await translate('Failed to create group');
+      showToast(errorMsg, 'error');
     } finally {
       setCreating(false);
     }
   };
 
   const formatLastActivity = (dateString: string) => {
-    if (!dateString) return 'No activity yet';
+    if (!dateString) return translatedLabels[12] || 'No activity yet';
     
     const date = new Date(dateString);
     const now = new Date();
@@ -144,10 +175,10 @@ const DiscussionGroupsPage = () => {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
+    if (minutes < 1) return translatedLabels[10] || 'Just now';
+    if (minutes < 60) return `${minutes}${translatedTimeUnits[0] || 'm'} ${translatedLabels[11] || 'ago'}`;
+    if (hours < 24) return `${hours}${translatedTimeUnits[1] || 'h'} ${translatedLabels[11] || 'ago'}`;
+    if (days < 7) return `${days}${translatedTimeUnits[2] || 'd'} ${translatedLabels[11] || 'ago'}`;
     return date.toLocaleDateString();
   };
 
@@ -198,10 +229,10 @@ const DiscussionGroupsPage = () => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
             <Box>
               <Typography variant="h4" fontWeight="bold" color="primary" sx={{ mb: 1 }}>
-                💬 Discussion Forum
+                💬 <Translate text="Discussion Forum" />
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                Join groups, share knowledge, and learn from the community
+                <Translate text="Join groups, share knowledge, and learn from the community" />
               </Typography>
             </Box>
             {userRole === 'Extension Officer' && (
@@ -211,7 +242,7 @@ const DiscussionGroupsPage = () => {
                 onClick={() => setCreateDialogOpen(true)}
                 sx={{ height: 'fit-content' }}
               >
-                Create Group
+                <Translate text="Create Group" />
               </Button>
             )}
           </Box>
@@ -223,7 +254,7 @@ const DiscussionGroupsPage = () => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    placeholder="Search groups by name or description..."
+                    placeholder={translatedLabels[2] || "Search groups by name or description..."}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     InputProps={{
@@ -237,13 +268,13 @@ const DiscussionGroupsPage = () => {
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth>
-                    <InputLabel>Topic</InputLabel>
+                    <InputLabel><Translate text="Topic" /></InputLabel>
                     <Select
                       value={selectedTopic}
-                      label="Topic"
+                      label={<Translate text="Topic" />}
                       onChange={(e) => setSelectedTopic(e.target.value)}
                     >
-                      <MenuItem value="">All Topics</MenuItem>
+                      <MenuItem value="">{translatedLabels[0]}</MenuItem>
                       {topics.map((topic) => (
                         <MenuItem key={topic} value={topic}>
                           {topic}
@@ -254,13 +285,13 @@ const DiscussionGroupsPage = () => {
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth>
-                    <InputLabel>Location</InputLabel>
+                    <InputLabel><Translate text="Location" /></InputLabel>
                     <Select
                       value={selectedLocation}
-                      label="Location"
+                      label={<Translate text="Location" />}
                       onChange={(e) => setSelectedLocation(e.target.value)}
                     >
-                      <MenuItem value="">All Locations</MenuItem>
+                      <MenuItem value="">{translatedLabels[1]}</MenuItem>
                       {locations.map((location) => (
                         <MenuItem key={location} value={location}>
                           {location}
@@ -282,18 +313,18 @@ const DiscussionGroupsPage = () => {
 
           {/* Groups List */}
           <Typography variant="h6" sx={{ mb: 2 }}>
-            {filteredGroups.length} group{filteredGroups.length !== 1 ? 's' : ''} found
+            {filteredGroups.length} {filteredGroups.length === 1 ? translatedLabels[3] : translatedLabels[4]} {translatedLabels[5]}
           </Typography>
 
           {filteredGroups.length === 0 ? (
             <Card sx={{ textAlign: 'center', py: 6 }}>
               <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                No groups found
+                <Translate text="No groups found" />
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {userRole === 'Extension Officer' 
-                  ? 'Be the first to create a discussion group!'
-                  : 'Check back later for new groups'}
+                  ? <Translate text="Be the first to create a discussion group!" />
+                  : <Translate text="Check back later for new groups" />}
               </Typography>
             </Card>
           ) : (
@@ -329,6 +360,7 @@ const DiscussionGroupsPage = () => {
                         <Box sx={{ flex: 1 }}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 1 }}>
                             <Box>
+                              {/* Don't translate group name - it's user content */}
                               <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
                                 {group.name}
                               </Typography>
@@ -339,6 +371,7 @@ const DiscussionGroupsPage = () => {
                             </Box>
                           </Box>
 
+                          {/* Don't translate description - it's user content */}
                           {group.description && (
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                               {group.description}
@@ -352,14 +385,14 @@ const DiscussionGroupsPage = () => {
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                               <PeopleIcon fontSize="small" color="action" />
                               <Typography variant="body2" color="text.secondary">
-                                {group.member_count} member{group.member_count !== 1 ? 's' : ''}
+                                {group.member_count} {group.member_count === 1 ? translatedLabels[6] : translatedLabels[7]}
                               </Typography>
                             </Box>
 
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                               <MessageIcon fontSize="small" color="action" />
                               <Typography variant="body2" color="text.secondary">
-                                {group.message_count} message{group.message_count !== 1 ? 's' : ''}
+                                {group.message_count} {group.message_count === 1 ? translatedLabels[8] : translatedLabels[9]}
                               </Typography>
                             </Box>
 
@@ -371,11 +404,11 @@ const DiscussionGroupsPage = () => {
                             </Box>
                           </Box>
 
-                          {/* Last Message Preview */}
+                          {/* Last Message Preview - Don't translate message content */}
                           {group.last_message && (
                             <Box sx={{ mt: 2, p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1 }}>
                               <Typography variant="caption" color="text.secondary">
-                                Last message by {group.last_message_user}:
+                                {translatedLabels[13]} {group.last_message_user}:
                               </Typography>
                               <Typography variant="body2" sx={{ mt: 0.5 }}>
                                 {group.last_message.length > 100
@@ -385,10 +418,10 @@ const DiscussionGroupsPage = () => {
                             </Box>
                           )}
 
-                          {/* Creator Info */}
+                          {/* Creator Info - Don't translate names */}
                           <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Typography variant="caption" color="text.secondary">
-                              Created by {group.creator_first_name} {group.creator_last_name}
+                              {translatedLabels[14]} {group.creator_first_name} {group.creator_last_name}
                             </Typography>
                             <Chip
                               label={group.creator_role}
@@ -413,18 +446,18 @@ const DiscussionGroupsPage = () => {
             maxWidth="sm"
             fullWidth
           >
-            <DialogTitle>Create Discussion Group</DialogTitle>
+            <DialogTitle><Translate text="Create Discussion Group" /></DialogTitle>
             <DialogContent>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
                 <TextField
-                  label="Group Name *"
+                  label={<Translate text="Group Name *" />}
                   fullWidth
                   value={newGroup.name}
                   onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
                 />
 
                 <TextField
-                  label="Description"
+                  label={<Translate text="Description" />}
                   fullWidth
                   multiline
                   rows={3}
@@ -433,10 +466,10 @@ const DiscussionGroupsPage = () => {
                 />
 
                 <FormControl fullWidth>
-                  <InputLabel>Topic *</InputLabel>
+                  <InputLabel><Translate text="Topic *" /></InputLabel>
                   <Select
                     value={newGroup.topic}
-                    label="Topic *"
+                    label={<Translate text="Topic *" />}
                     onChange={(e) => setNewGroup({ ...newGroup, topic: e.target.value })}
                   >
                     {topics.map((topic) => (
@@ -448,10 +481,10 @@ const DiscussionGroupsPage = () => {
                 </FormControl>
 
                 <FormControl fullWidth>
-                  <InputLabel>Location</InputLabel>
+                  <InputLabel><Translate text="Location" /></InputLabel>
                   <Select
                     value={newGroup.location}
-                    label="Location"
+                    label={<Translate text="Location" />}
                     onChange={(e) => setNewGroup({ ...newGroup, location: e.target.value })}
                   >
                     {locations.map((location) => (
@@ -464,7 +497,7 @@ const DiscussionGroupsPage = () => {
 
                 <Box>
                   <Typography variant="body2" sx={{ mb: 1 }}>
-                    Choose an icon:
+                    <Translate text="Choose an icon:" />
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     {icons.map((icon) => (
@@ -482,13 +515,15 @@ const DiscussionGroupsPage = () => {
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setCreateDialogOpen(false)}>Cancel</Button>
+              <Button onClick={() => setCreateDialogOpen(false)}>
+                <Translate text="Cancel" />
+              </Button>
               <Button
                 variant="contained"
                 onClick={handleCreateGroup}
                 disabled={creating}
               >
-                {creating ? <CircularProgress size={24} /> : 'Create Group'}
+                {creating ? <CircularProgress size={24} /> : <Translate text="Create Group" />}
               </Button>
             </DialogActions>
           </Dialog>

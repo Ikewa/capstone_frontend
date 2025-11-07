@@ -25,11 +25,15 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
 import { ToastContext } from '../context/ToastContext'
+import Translate from '../components/Translate'
+import { useTranslate } from '../hooks/useTranslate'
+import { useLanguage } from '../context/LanguageContext'
 
 function EventDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { showToast } = useContext(ToastContext)
+  const { translate } = useLanguage()
   
   const [event, setEvent] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -37,6 +41,17 @@ function EventDetailPage() {
   const [success, setSuccess] = useState('')
   const [isRegistered, setIsRegistered] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+
+  // Translate button labels
+  const buttonLabels = [
+    'Cancel Registration',
+    'Cancelling...',
+    "You're registered!",
+    'Register for Event',
+    'Registering...',
+    'Event Full'
+  ];
+  const { translated: translatedButtons } = useTranslate(buttonLabels);
 
   useEffect(() => {
     fetchEvent()
@@ -71,7 +86,8 @@ function EventDetailPage() {
     const token = localStorage.getItem('token')
     
     if (!token) {
-      showToast('Please login to register for events', 'warning')
+      const msg = await translate('Please login to register for events')
+      showToast(msg, 'warning')
       navigate('/login')
       return
     }
@@ -87,14 +103,14 @@ function EventDetailPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       )
 
-      const successMsg = 'Successfully registered for this event! 🎉'
+      const successMsg = await translate('Successfully registered for this event! 🎉')
       setSuccess(successMsg)
       showToast(successMsg, 'success')
       setIsRegistered(true)
       fetchEvent()
     } catch (err: any) {
       console.error('Registration error:', err)
-      const errorMsg = err.response?.data?.message || 'Failed to register for event.'
+      const errorMsg = err.response?.data?.message || await translate('Failed to register for event.')
       setError(errorMsg)
       showToast(errorMsg, 'error')
     } finally {
@@ -116,14 +132,14 @@ function EventDetailPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       )
 
-      const successMsg = 'Registration cancelled successfully.'
+      const successMsg = await translate('Registration cancelled successfully.')
       setSuccess(successMsg)
       showToast(successMsg, 'info')
       setIsRegistered(false)
       fetchEvent()
     } catch (err: any) {
       console.error('Cancellation error:', err)
-      const errorMsg = err.response?.data?.message || 'Failed to cancel registration.'
+      const errorMsg = err.response?.data?.message || await translate('Failed to cancel registration.')
       setError(errorMsg)
       showToast(errorMsg, 'error')
     } finally {
@@ -177,7 +193,7 @@ function EventDetailPage() {
   if (!event) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error">Event not found</Alert>
+        <Alert severity="error"><Translate text="Event not found" /></Alert>
       </Container>
     )
   }
@@ -194,7 +210,7 @@ function EventDetailPage() {
             onClick={() => navigate('/events')}
             sx={{ mb: 3, color: 'primary.main' }}
           >
-            Back to Events
+            <Translate text="Back to Events" />
           </Button>
 
           {/* Success/Error Messages */}
@@ -212,7 +228,7 @@ function EventDetailPage() {
           {/* Main Event Card */}
           <Card sx={{ mb: 4 }}>
             <CardContent sx={{ p: 4 }}>
-              {/* Event Type Badge */}
+              {/* Event Type Badge - Don't translate (it's a category) */}
               <Chip 
                 label={event.event_type}
                 size="small"
@@ -224,7 +240,7 @@ function EventDetailPage() {
                 }}
               />
 
-              {/* Title */}
+              {/* Title - Don't translate (user content) */}
               <Typography 
                 variant="h3" 
                 sx={{ 
@@ -243,7 +259,7 @@ function EventDetailPage() {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <CalendarMonthIcon sx={{ color: 'primary.main' }} />
                     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                      Date & Time
+                      <Translate text="Date & Time" />
                     </Typography>
                   </Box>
                   <Typography variant="body1" color="text.secondary">
@@ -262,7 +278,7 @@ function EventDetailPage() {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <LocationOnIcon sx={{ color: 'primary.main' }} />
                     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                      Location
+                      <Translate text="Location" />
                     </Typography>
                   </Box>
                   <Typography variant="body1" color="text.secondary">
@@ -280,7 +296,7 @@ function EventDetailPage() {
 
               {/* Description */}
               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-                About This Event
+                <Translate text="About This Event" />
               </Typography>
               <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.8 }}>
                 {event.description}
@@ -290,8 +306,12 @@ function EventDetailPage() {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
                 <PeopleIcon sx={{ color: 'success.main' }} />
                 <Typography variant="h6" sx={{ color: 'success.main', fontWeight: 'bold' }}>
-                  {event.attendee_count} {event.attendee_count === 1 ? 'person' : 'people'} attending
-                  {event.max_attendees && ` (${event.max_attendees} max)`}
+                  {event.attendee_count} {event.attendee_count === 1 ? <Translate text="person" /> : <Translate text="people" />} <Translate text="attending" />
+                  {event.max_attendees && (
+                    <>
+                      {' '}(<Translate text="max" /> {event.max_attendees})
+                    </>
+                  )}
                 </Typography>
               </Box>
 
@@ -306,11 +326,11 @@ function EventDetailPage() {
                     disabled={submitting}
                     color="error"
                   >
-                    {submitting ? 'Cancelling...' : 'Cancel Registration'}
+                    {submitting ? translatedButtons[1] : translatedButtons[0]}
                   </Button>
                   <Chip 
                     icon={<CheckCircleIcon />}
-                    label="You're registered!"
+                    label={translatedButtons[2]}
                     color="success"
                     sx={{ fontWeight: 'bold' }}
                   />
@@ -328,7 +348,7 @@ function EventDetailPage() {
                     fontSize: '1.1rem',
                   }}
                 >
-                  {submitting ? 'Registering...' : isEventFull() ? 'Event Full' : 'Register for Event'}
+                  {submitting ? translatedButtons[4] : isEventFull() ? translatedButtons[5] : translatedButtons[3]}
                 </Button>
               )}
             </CardContent>
@@ -339,7 +359,7 @@ function EventDetailPage() {
             <Card>
               <CardContent sx={{ p: 4 }}>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main', mb: 3 }}>
-                  Attendees ({event.attendees.length})
+                  <Translate text="Attendees" /> ({event.attendees.length})
                 </Typography>
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>

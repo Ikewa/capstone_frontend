@@ -125,8 +125,8 @@ const BookingRequestPage = () => {
             BACK TO HOME
           </Button>
 
-          {/* Header */}
-          <Paper elevation={2} sx={{ p: 4, mb: 3, backgroundColor: '#1976d2', color: 'white' }}>
+          {/* Header - CHANGED TO GREEN */}
+          <Paper elevation={2} sx={{ p: 4, mb: 3, backgroundColor: 'secondary.main', color: 'white' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <EventIcon sx={{ fontSize: 48, mr: 2 }} />
               <Box>
@@ -227,7 +227,7 @@ const BookingRequestPage = () => {
                   placeholder="Any other information that might be helpful"
                 />
 
-                {/* Submit Button */}
+                {/* Submit Button - CHANGED TO GREEN */}
                 <Button
                   type="submit"
                   variant="contained"
@@ -236,20 +236,20 @@ const BookingRequestPage = () => {
                   disabled={loading}
                   endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
                   sx={{
-                    backgroundColor: '#1976d2',
-                    '&:hover': { backgroundColor: '#115293' },
+                    backgroundColor: 'secondary.main',
+                    '&:hover': { backgroundColor: 'secondary.dark' },
                     py: 1.5
                   }}
                 >
                   {loading ? 'Submitting...' : 'Submit Booking Request'}
                 </Button>
 
-                {/* View My Bookings Link */}
+                {/* View My Bookings Link - CHANGED TO GREEN */}
                 <Button
                   variant="text"
                   fullWidth
                   onClick={() => navigate('/my-bookings')}
-                  sx={{ color: '#1976d2' }}
+                  sx={{ color: 'secondary.main' }}
                 >
                   View My Bookings
                 </Button>

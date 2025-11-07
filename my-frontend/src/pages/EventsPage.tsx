@@ -22,6 +22,8 @@ import PeopleIcon from '@mui/icons-material/People'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
+import Translate from '../components/Translate'
+import { useTranslate } from '../hooks/useTranslate'
 
 function EventsPage() {
   const navigate = useNavigate()
@@ -33,8 +35,22 @@ function EventsPage() {
   const [locationFilter, setLocationFilter] = useState('all')
   const [typeFilter, setTypeFilter] = useState('all')
 
-  const nigerianStates = [
+  // Translate filter labels
+  const filterLabels = [
     'All Locations',
+    'All Types',
+    'Search events by title or description...',
+    'event',
+    'events',
+    'found',
+    'attending',
+    'max',
+    'at'
+  ];
+  const { translated: translatedLabels } = useTranslate(filterLabels);
+
+  const nigerianStates = [
+    translatedLabels[0] || 'All Locations',
     'Kano State',
     'Kaduna State',
     'Katsina State',
@@ -58,7 +74,7 @@ function EventsPage() {
   ]
 
   const eventTypes = [
-    'All Types',
+    translatedLabels[1] || 'All Types',
     'Workshop',
     'Training',
     'Seminar',
@@ -142,16 +158,16 @@ function EventsPage() {
             onClick={() => navigate('/home')}
             sx={{ mb: 3, color: 'primary.main' }}
           >
-            Back to Home
+            <Translate text="Back to Home" />
           </Button>
 
           {/* Header */}
           <Box sx={{ mb: 4 }}>
             <Typography variant="h3" sx={{ color: 'primary.main', fontWeight: 'bold', mb: 1 }}>
-              📅 Agricultural Events
+              📅 <Translate text="Agricultural Events" />
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Discover workshops, training sessions, and networking opportunities
+              <Translate text="Discover workshops, training sessions, and networking opportunities" />
             </Typography>
           </Box>
 
@@ -169,7 +185,7 @@ function EventsPage() {
                 {/* Search */}
                 <TextField
                   fullWidth
-                  placeholder="Search events by title or description..."
+                  placeholder={translatedLabels[2] || 'Search events by title or description...'}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -189,8 +205,8 @@ function EventsPage() {
                   onChange={(e) => setLocationFilter(e.target.value)}
                   sx={{ minWidth: 200 }}
                 >
-                  {nigerianStates.map((state) => (
-                    <MenuItem key={state} value={state === 'All Locations' ? 'all' : state}>
+                  {nigerianStates.map((state, index) => (
+                    <MenuItem key={state} value={index === 0 ? 'all' : state}>
                       {state}
                     </MenuItem>
                   ))}
@@ -203,8 +219,8 @@ function EventsPage() {
                   onChange={(e) => setTypeFilter(e.target.value)}
                   sx={{ minWidth: 150 }}
                 >
-                  {eventTypes.map((type) => (
-                    <MenuItem key={type} value={type === 'All Types' ? 'all' : type}>
+                  {eventTypes.map((type, index) => (
+                    <MenuItem key={type} value={index === 0 ? 'all' : type}>
                       {type}
                     </MenuItem>
                   ))}
@@ -216,7 +232,7 @@ function EventsPage() {
                   onClick={handleSearch}
                   sx={{ minWidth: 100 }}
                 >
-                  Search
+                  <Translate text="Search" />
                 </Button>
               </Box>
             </CardContent>
@@ -233,14 +249,14 @@ function EventsPage() {
           {!loading && (
             <>
               <Typography variant="h6" sx={{ mb: 3, color: 'text.secondary' }}>
-                {events.length} event{events.length !== 1 ? 's' : ''} found
+                {events.length} {events.length === 1 ? translatedLabels[3] : translatedLabels[4]} {translatedLabels[5]}
               </Typography>
 
               {events.length === 0 ? (
                 <Card>
                   <CardContent sx={{ textAlign: 'center', py: 8 }}>
                     <Typography variant="h6" color="text.secondary">
-                      No events found. Try adjusting your filters.
+                      <Translate text="No events found. Try adjusting your filters." />
                     </Typography>
                   </CardContent>
                 </Card>
@@ -266,7 +282,7 @@ function EventsPage() {
                       }}
                     >
                       <CardContent sx={{ p: 3 }}>
-                        {/* Event Type Badge */}
+                        {/* Event Type Badge - Don't translate */}
                         <Chip 
                           label={event.event_type}
                           size="small"
@@ -278,7 +294,7 @@ function EventsPage() {
                           }}
                         />
 
-                        {/* Title */}
+                        {/* Title - Don't translate (user content) */}
                         <Typography 
                           variant="h6" 
                           sx={{ 
@@ -290,7 +306,7 @@ function EventsPage() {
                           {event.title}
                         </Typography>
 
-                        {/* Description */}
+                        {/* Description - Don't translate (user content) */}
                         <Typography 
                           variant="body2" 
                           color="text.secondary"
@@ -309,11 +325,11 @@ function EventsPage() {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                           <CalendarMonthIcon fontSize="small" sx={{ color: 'text.secondary' }} />
                           <Typography variant="body2" color="text.secondary">
-                            {formatDate(event.event_date)} at {formatTime(event.event_time)}
+                            {formatDate(event.event_date)} {translatedLabels[8]} {formatTime(event.event_time)}
                           </Typography>
                         </Box>
 
-                        {/* Location */}
+                        {/* Location - Don't translate location names */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                           <LocationOnIcon fontSize="small" sx={{ color: 'text.secondary' }} />
                           <Typography variant="body2" color="text.secondary">
@@ -325,8 +341,8 @@ function EventsPage() {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <PeopleIcon fontSize="small" sx={{ color: 'success.main' }} />
                           <Typography variant="body2" sx={{ color: 'success.main', fontWeight: 'bold' }}>
-                            {event.attendee_count || 0} attending
-                            {event.max_attendees && ` / ${event.max_attendees} max`}
+                            {event.attendee_count || 0} {translatedLabels[6]}
+                            {event.max_attendees && ` / ${event.max_attendees} ${translatedLabels[7]}`}
                           </Typography>
                         </Box>
                       </CardContent>

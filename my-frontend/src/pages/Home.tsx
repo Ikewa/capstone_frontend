@@ -2,11 +2,15 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import DashboardPage from "./DashboardPage";
+import { useLanguage } from "../context/LanguageContext";
 
 function Home() {
   const navigate = useNavigate();
+  const { language } = useLanguage();
 
   useEffect(() => {
+    console.log('Current language:', language);
+    
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
@@ -25,7 +29,7 @@ function Home() {
         localStorage.removeItem("token");
         navigate("/login");
       });
-  }, [navigate]);
+  }, [navigate, language]);
 
   return (
     <div>
