@@ -13,6 +13,7 @@ import EventDetailPage from './pages/EventDetailPage'
 import CropRecommendationRequestPage from "./pages/CropRecommendationRequestPage"
 import MyCropRequestsPage from "./pages/MyCropRequestsPage"
 import RequestDetailPage from "./pages/RequestDetailPage"
+import OfficerCropRequestsPage from "./pages/OfficerCropRequestsPage"  // ← NEW IMPORT
 import { ToastProvider } from './context/ToastContext'
 import CropCatalogPage from './pages/CropCatalogPage'
 import BookingRequestPage from './pages/BookingRequestPage'
@@ -29,8 +30,24 @@ import { SocketProvider } from './context/SocketContext'
 import DiscussionGroupsPage from './pages/DiscussionGroupsPage'
 import GroupDiscussionPage from './pages/GroupDiscussionPage'
 import NotesWrapper from './components/NotesWrapper'
-// import { Language } from "@mui/icons-material"
 import { LanguageProvider } from "./context/LanguageContext"
+import AdminLogin from './pages/admin/AdminLogin'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import CreateAdmin from './pages/admin/CreateAdmin'
+import AdminUsers from './pages/admin/AdminUsers'
+import AdminQuestions from './pages/admin/AdminQuestions'
+import AdminGroups from './pages/admin/AdminGroups'
+import AdminEvents from './pages/admin/AdminEvents'
+import AdminReports from './pages/admin/AdminReports'
+import AdminSettings from './pages/admin/AdminSettings'
+import AdminCropCatalog from './pages/admin/AdminCropCatalog'
+import CropCatalog from './pages/CropCatalog'
+import CropDetail from './pages/CropDetail'
+import CropComparison from './pages/CropComparison'
+import PlantingCalendar from './pages/PlantingCalendar'
+import GrowingGuide from './pages/GrowingGuide'
+
+
 
 function App() {
   return (
@@ -59,12 +76,19 @@ function App() {
             <Route path="/my-events" element={<MyEventsPage />} />
             <Route path="/create-event" element={<CreateEventPage />} />
             
-            {/* Crops */}
+            {/* Crops - Farmers */}
             <Route path="/crop-catalog" element={<CropCatalogPage />} />
             <Route path="/crop-recommendations" element={<CropRecommendationRequestPage />} />
             <Route path="/my-crop-requests" element={<MyCropRequestsPage />} />
             <Route path="/crop-requests/:id" element={<RequestDetailPage />} />
-            
+            <Route path="/crop-catalog/:id" element={<CropDetail />} />
+            <Route path="/crop-comparison" element={<CropComparison />} />
+            <Route path="/planting-calendar" element={<PlantingCalendar />} />
+            <Route path="/crop-catalog/:id/growing-guide" element={<GrowingGuide />} />
+
+            {/* Crops - Officers */}
+            <Route path="/officer/crop-requests" element={<OfficerCropRequestsPage />} />  {/* ← NEW ROUTE */}
+
             {/* Bookings */}
             <Route path="/book-consultation" element={<BookingRequestPage />} />
             <Route path="/my-bookings" element={<MyBookingsPage />} />
@@ -79,6 +103,19 @@ function App() {
             {/* Other */}
             <Route path="/map" element={<MapPage />} />
             <Route path="/booking" element={<Booking />} />
+            <Route path="/crop-catalog" element={<CropCatalog />} />
+
+            {/* ==================== ADMIN ROUTES ==================== */}
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/create-admin" element={<CreateAdmin />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/questions" element={<AdminQuestions />} />
+            <Route path="/admin/groups" element={<AdminGroups />} />
+            <Route path="/admin/events" element={<AdminEvents />} />
+            <Route path="/admin/reports" element={<AdminReports />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/crop-catalog" element={<AdminCropCatalog />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

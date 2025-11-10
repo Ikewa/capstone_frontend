@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   CardContent,
+  CardMedia,
   Chip,
   CircularProgress,
   Alert,
@@ -18,7 +19,8 @@ import {
   FormControl,
   InputLabel,
   Stack,
-  Divider
+  Divider,
+  Grid
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
@@ -40,6 +42,7 @@ interface CropRequest {
   landSize: number;
   landSizeUnit: string;
   challenges: string;
+  images?: string[];
   status: 'pending' | 'reviewed' | 'responded';
   officer?: {
     name: string;
@@ -75,6 +78,7 @@ const MyCropRequestsPage: React.FC = () => {
       const response = await axios.get('http://localhost:5000/api/crop-requests/my-requests', {
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log('✅ My requests:', response.data);
       setRequests(response.data.requests || []);
     } catch (err: any) {
       console.error('Error fetching requests:', err);
@@ -356,67 +360,108 @@ const MyCropRequestsPage: React.FC = () => {
                   onClick={() => navigate(`/crop-requests/${request._id}`)}
                 >
                   <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
-                      <Box sx={{ flex: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          <LocationOnIcon sx={{ color: '#2e7d32', fontSize: 20 }} />
-                          <Typography variant="h6" fontWeight="bold">
-                            {request.location}
+                    <Grid container spacing={3}>
+                      {/* Left: Request Details */}
+                      <Grid item xs={12} md={request.images && request.images.length > 0 ? 8 : 12}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                          <Box sx={{ flex: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                              <LocationOnIcon sx={{ color: '#2e7d32', fontSize: 20 }} />
+                              <Typography variant="h6" fontWeight="bold">
+                                {request.location}
+                              </Typography>
+                              <Chip
+                                icon={getStatusIcon(request.status)}
+                                label={request.status.toUpperCase()}
+                                color={getStatusColor(request.status) as any}
+                                size="small"
+                              />
+                            </Box>
+                            
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                              {request.challenges}
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 1 }}>
+                              <Chip
+                                label={`${request.soilType} Soil`}
+                                size="small"
+                                sx={{ backgroundColor: '#e8f5e9' }}
+                              />
+                              <Chip
+                                label={request.season}
+                                size="small"
+                                sx={{ backgroundColor: '#e3f2fd' }}
+                              />
+                              <Chip
+                                label={`${request.landSize} ${request.landSizeUnit}`}
+                                size="small"
+                                sx={{ backgroundColor: '#fff3e0' }}
+                              />
+                            </Box>
+                          </Box>
+                        </Box>
+
+                        <Divider sx={{ my: 2 }} />
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            <Typography variant="caption" color="text.secondary">
+                              Submitted: {formatDate(request.createdAt)}
+                            </Typography>
+                          </Box>
+                          
+                          {request.status === 'responded' && request.officer && (
+                            <Typography variant="caption" color="success.main" fontWeight="medium">
+                              ✓ Responded by {request.officer.name}
+                            </Typography>
+                          )}
+                          
+                          {request.status === 'pending' && (
+                            <Typography variant="caption" color="warning.main" fontWeight="medium">
+                              ⏳ Awaiting officer response
+                            </Typography>
+                          )}
+                        </Box>
+                      </Grid>
+
+                      {/* Right: Images */}
+                      {request.images && request.images.length > 0 && (
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                            📷 Field Photos ({request.images.length})
                           </Typography>
-                          <Chip
-                            icon={getStatusIcon(request.status)}
-                            label={request.status.toUpperCase()}
-                            color={getStatusColor(request.status)}
-                            size="small"
-                          />
-                        </Box>
-                        
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                          {request.challenges}
-                        </Typography>
-
-                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 1 }}>
-                          <Chip
-                            label={`${request.soilType} Soil`}
-                            size="small"
-                            sx={{ backgroundColor: '#e8f5e9' }}
-                          />
-                          <Chip
-                            label={request.season}
-                            size="small"
-                            sx={{ backgroundColor: '#e3f2fd' }}
-                          />
-                          <Chip
-                            label={`${request.landSize} ${request.landSizeUnit}`}
-                            size="small"
-                            sx={{ backgroundColor: '#fff3e0' }}
-                          />
-                        </Box>
-                      </Box>
-                    </Box>
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="caption" color="text.secondary">
-                          Submitted: {formatDate(request.createdAt)}
-                        </Typography>
-                      </Box>
-                      
-                      {request.status === 'responded' && request.officer && (
-                        <Typography variant="caption" color="success.main" fontWeight="medium">
-                          ✓ Responded by {request.officer.name}
-                        </Typography>
+                          <Grid container spacing={1}>
+                            {request.images.slice(0, 4).map((image, index) => (
+                              <Grid item xs={6} key={index}>
+                                <CardMedia
+                                  component="img"
+                                  image={image}
+                                  alt={`Field photo ${index + 1}`}
+                                  sx={{
+                                    height: 100,
+                                    borderRadius: 1,
+                                    objectFit: 'cover',
+                                    cursor: 'pointer',
+                                    '&:hover': { opacity: 0.8 }
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(image, '_blank');
+                                  }}
+                                />
+                              </Grid>
+                            ))}
+                          </Grid>
+                          {request.images.length > 4 && (
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              +{request.images.length - 4} more photos
+                            </Typography>
+                          )}
+                        </Grid>
                       )}
-                      
-                      {request.status === 'pending' && (
-                        <Typography variant="caption" color="warning.main" fontWeight="medium">
-                          ⏳ Awaiting officer response
-                        </Typography>
-                      )}
-                    </Box>
+                    </Grid>
                   </CardContent>
                 </Card>
               ))}

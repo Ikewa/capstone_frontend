@@ -15,6 +15,7 @@ import {
   TextField,
   CircularProgress,
   Alert,
+  Grid,
 } from '@mui/material'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
@@ -38,6 +39,7 @@ interface Answer {
   is_accepted: boolean
   created_at: string
   image_url?: string
+  images?: string[]  // ← ADD THIS
   user_id: number
 }
 
@@ -53,6 +55,7 @@ interface Question {
   views: number
   created_at: string
   image_url?: string
+  images?: string[]  // ← ADD THIS
   answers: Answer[]
   user_id: number
 }
@@ -142,6 +145,7 @@ function QuestionDetailPage() {
       setError('')
 
       const response = await axios.get(`http://localhost:5000/api/questions/${id}`)
+      console.log('📦 Question data:', response.data.question)
       setQuestion(response.data.question)
       setLoading(false)
 
@@ -319,22 +323,28 @@ function QuestionDetailPage() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-        <CircularProgress size={60} />
-      </Box>
+      <>
+        <Navbar />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+          <CircularProgress size={60} />
+        </Box>
+      </>
     )
   }
 
   if (error || !question) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error || translatedLabels[12]}
-        </Alert>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/home')}>
-          <Translate text="Back to Home" />
-        </Button>
-      </Container>
+      <>
+        <Navbar />
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error || translatedLabels[12]}
+          </Alert>
+          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/home')}>
+            <Translate text="Back to Home" />
+          </Button>
+        </Container>
+      </>
     )
   }
 
@@ -413,7 +423,7 @@ function QuestionDetailPage() {
 
                 {/* Question Content */}
                 <Box sx={{ flex: 1 }}>
-                  {/* Title - Don't translate (user content) */}
+                  {/* Title */}
                   <Typography 
                     variant="h4" 
                     sx={{ 
@@ -464,7 +474,7 @@ function QuestionDetailPage() {
                     </Box>
                   </Box>
 
-                  {/* Description - Don't translate (user content) */}
+                  {/* Description */}
                   <Typography 
                     variant="body1" 
                     sx={{ 
@@ -476,8 +486,43 @@ function QuestionDetailPage() {
                     {question.description}
                   </Typography>
 
-                  {/* Image if exists */}
-                  {question.image_url && (
+                  {/* ✅ DISPLAY QUESTION IMAGES */}
+                  {question.images && question.images.length > 0 && (
+                    <Box sx={{ mb: 3 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold', color: 'primary.main' }}>
+                        📷 Attached Images ({question.images.length})
+                      </Typography>
+                      <Grid container spacing={2}>
+                        {question.images.map((imageUrl: string, index: number) => (
+                          <Grid item xs={12} sm={6} md={4} key={index}>
+                            <Box
+                              component="img"
+                              src={imageUrl}
+                              alt={`Question image ${index + 1}`}
+                              sx={{
+                                width: '100%',
+                                height: 200,
+                                objectFit: 'cover',
+                                borderRadius: 2,
+                                border: '1px solid #e0e0e0',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                '&:hover': {
+                                  opacity: 0.9,
+                                  transform: 'scale(1.02)',
+                                  boxShadow: 3,
+                                },
+                              }}
+                              onClick={() => window.open(imageUrl, '_blank')}
+                            />
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Box>
+                  )}
+
+                  {/* Old single image support (keep for backwards compatibility) */}
+                  {question.image_url && !question.images && (
                     <Box 
                       component="img"
                       src={question.image_url}
@@ -486,12 +531,14 @@ function QuestionDetailPage() {
                         maxWidth: '100%',
                         maxHeight: 400,
                         borderRadius: 2,
-                        mb: 3
+                        mb: 3,
+                        cursor: 'pointer'
                       }}
+                      onClick={() => window.open(question.image_url, '_blank')}
                     />
                   )}
 
-                  {/* Tags - Don't translate (user content) */}
+                  {/* Tags */}
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     {question.tags?.map((tag: string) => (
                       <Chip 
@@ -565,7 +612,7 @@ function QuestionDetailPage() {
                       <ThumbDownIcon />
                     </IconButton>
 
-                    {/* Accept Answer Button (only for question author) */}
+                    {/* Accept Answer Button */}
                     {currentUserId === question.user_id && !answer.is_accepted && (
                       <IconButton 
                         onClick={() => handleAcceptAnswer(answer.id)}
@@ -632,19 +679,54 @@ function QuestionDetailPage() {
                       </Box>
                     </Box>
 
-                    {/* Content - Don't translate (user content) */}
+                    {/* Content */}
                     <Typography 
                       variant="body1" 
                       sx={{ 
                         lineHeight: 1.8,
-                        whiteSpace: 'pre-wrap'
+                        whiteSpace: 'pre-wrap',
+                        mb: 2
                       }}
                     >
                       {answer.content}
                     </Typography>
 
-                    {/* Image if exists */}
-                    {answer.image_url && (
+                    {/* ✅ DISPLAY ANSWER IMAGES */}
+                    {answer.images && answer.images.length > 0 && (
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                          📷 Attached Images
+                        </Typography>
+                        <Grid container spacing={2}>
+                          {answer.images.map((imageUrl: string, index: number) => (
+                            <Grid item xs={12} sm={6} md={4} key={index}>
+                              <Box
+                                component="img"
+                                src={imageUrl}
+                                alt={`Answer image ${index + 1}`}
+                                sx={{
+                                  width: '100%',
+                                  height: 150,
+                                  objectFit: 'cover',
+                                  borderRadius: 1,
+                                  border: '1px solid #e0e0e0',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s',
+                                  '&:hover': {
+                                    opacity: 0.9,
+                                    transform: 'scale(1.02)',
+                                  },
+                                }}
+                                onClick={() => window.open(imageUrl, '_blank')}
+                              />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </Box>
+                    )}
+
+                    {/* Old single image support (keep for backwards compatibility) */}
+                    {answer.image_url && !answer.images && (
                       <Box 
                         component="img"
                         src={answer.image_url}
@@ -653,8 +735,10 @@ function QuestionDetailPage() {
                           maxWidth: '100%',
                           maxHeight: 300,
                           borderRadius: 2,
-                          mt: 2
+                          mt: 2,
+                          cursor: 'pointer'
                         }}
+                        onClick={() => window.open(answer.image_url, '_blank')}
                       />
                     )}
                   </Box>

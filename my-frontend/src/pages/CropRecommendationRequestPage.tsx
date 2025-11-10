@@ -14,12 +14,18 @@ import {
   FormControl,
   InputLabel,
   Select,
-  Stack
+  Stack,
+  IconButton,
+  ImageList,
+  ImageListItem,
+  ImageListItemBar,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { ToastContext } from '../context/ToastContext';
@@ -30,6 +36,11 @@ const CropRecommendationRequestPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Image upload states
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   const [formData, setFormData] = useState({
     location: '',
@@ -72,6 +83,73 @@ const CropRecommendationRequestPage: React.FC = () => {
     setError('');
   };
 
+  // Handle image selection
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    if (files.length + selectedImages.length > 5) {
+      showToast('You can upload maximum 5 images', 'warning');
+      return;
+    }
+
+    // Validate file sizes
+    const invalidFiles = files.filter(file => file.size > 5 * 1024 * 1024);
+    if (invalidFiles.length > 0) {
+      showToast('Each image must be less than 5MB', 'warning');
+      return;
+    }
+
+    // Add files and create previews
+    setSelectedImages(prev => [...prev, ...files]);
+    
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Remove image
+  const handleRemoveImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Upload images to server
+  const uploadImages = async () => {
+    if (selectedImages.length === 0) return [];
+
+    try {
+      setUploadingImages(true);
+      const formData = new FormData();
+      selectedImages.forEach(image => {
+        formData.append('images', image);
+      });
+
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        'http://localhost:5000/api/crop-requests/upload-images',
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      return response.data.imageUrls;
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      showToast('Failed to upload images', 'error');
+      return [];
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -104,13 +182,17 @@ const CropRecommendationRequestPage: React.FC = () => {
     }
 
     try {
+      // Upload images first
+      const uploadedImageUrls = await uploadImages();
+
       const token = localStorage.getItem('token');
       
       const response = await axios.post(
         'http://localhost:5000/api/crop-requests',
         {
           ...formData,
-          landSize: parseFloat(formData.landSize)
+          landSize: parseFloat(formData.landSize),
+          images: uploadedImageUrls
         },
         {
           headers: {
@@ -134,6 +216,8 @@ const CropRecommendationRequestPage: React.FC = () => {
         challenges: '',
         additionalInfo: ''
       });
+      setSelectedImages([]);
+      setImagePreviews([]);
 
       // Redirect after 2 seconds
       setTimeout(() => {
@@ -313,21 +397,81 @@ const CropRecommendationRequestPage: React.FC = () => {
                   placeholder="Any other information that might help (market access, irrigation, budget, etc.)"
                 />
 
+                {/* ✅ NEW: Image Upload Section */}
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                    📸 Upload Photos (Optional)
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Upload photos of your crops, farm, or any problems you're facing. This helps officers provide better advice. (Max 5 images, 5MB each)
+                  </Typography>
+
+                  <input
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    id="crop-images-upload"
+                    type="file"
+                    multiple
+                    onChange={handleImageSelect}
+                  />
+                  <label htmlFor="crop-images-upload">
+                    <Button
+                      variant="outlined"
+                      component="span"
+                      startIcon={<PhotoCameraIcon />}
+                      disabled={selectedImages.length >= 5}
+                      fullWidth
+                    >
+                      {selectedImages.length === 0 ? 'Add Photos' : `Add More Photos (${selectedImages.length}/5)`}
+                    </Button>
+                  </label>
+
+                  {/* Image Previews */}
+                  {imagePreviews.length > 0 && (
+                    <ImageList sx={{ mt: 2 }} cols={3} rowHeight={164}>
+                      {imagePreviews.map((preview, index) => (
+                        <ImageListItem key={index}>
+                          <img
+                            src={preview}
+                            alt={`Preview ${index + 1}`}
+                            loading="lazy"
+                            style={{ objectFit: 'cover', height: '100%' }}
+                          />
+                          <ImageListItemBar
+                            actionIcon={
+                              <IconButton
+                                sx={{ color: 'rgba(255, 255, 255, 0.9)' }}
+                                onClick={() => handleRemoveImage(index)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            }
+                          />
+                        </ImageListItem>
+                      ))}
+                    </ImageList>
+                  )}
+                </Box>
+
                 {/* Submit Button */}
                 <Button
                   type="submit"
                   variant="contained"
                   size="large"
                   fullWidth
-                  disabled={loading}
-                  endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+                  disabled={loading || uploadingImages}
+                  endIcon={
+                    (loading || uploadingImages) ? 
+                    <CircularProgress size={20} color="inherit" /> : 
+                    <SendIcon />
+                  }
                   sx={{
                     backgroundColor: '#2e7d32',
                     '&:hover': { backgroundColor: '#1b5e20' },
                     py: 1.5
                   }}
                 >
-                  {loading ? 'Submitting...' : 'Submit Request'}
+                  {uploadingImages ? 'Uploading Images...' : loading ? 'Submitting...' : 'Submit Request'}
                 </Button>
 
                 {/* View My Requests Link */}

@@ -37,6 +37,8 @@ import LanguageIcon from '@mui/icons-material/Language';
 import axios from 'axios';
 import { useLanguage } from '../context/LanguageContext';
 import Translate from '../components/Translate';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+
 interface Notification {
   id: number;
   type: string;
@@ -198,35 +200,36 @@ const Navbar: React.FC = () => {
     handleProfileMenuClose();
   };
 
-// Get navItems based on user role
-const getNavItems = () => {
-  const baseItems = [
-    { label: <Translate text="Home" />, path: '/home', icon: <HomeIcon /> },
-    { label: <Translate text="Forum" />, path: '/forum', icon: <ForumIcon /> },
-    { label: <Translate text="Events" />, path: '/events', icon: <EventIcon /> },
-    { label: <Translate text="Crops Recommendation" />, path: '/crop-catalog', icon: <MenuBookIcon /> },
-    { label: <Translate text="Market place" />, path: '/map', icon: <MapIcon /> },
-  ];
-
-  // Role-specific items
-  if (user?.role === 'Extension Officer') {
-    return [
-      ...baseItems,
-      { label: <Translate text="My Events" />, path: '/my-events', icon: <EventIcon /> },
-      { label: <Translate text="Manage Bookings" />, path: '/manage-bookings', icon: <EventIcon /> },
-      { label: <Translate text="Crop Requests" />, path: '/my-crop-requests', icon: <AgricultureIcon /> },
+  // Get navItems based on user role
+  const getNavItems = () => {
+    const baseItems = [
+      { label: <Translate text="Home" />, path: '/home', icon: <HomeIcon /> },
+      { label: <Translate text="Forum" />, path: '/forum', icon: <ForumIcon /> },
+      { label: <Translate text="Events" />, path: '/events', icon: <EventIcon /> },
+      { label: <Translate text="Crop Library" />, path: '/crop-catalog', icon: <MenuBookIcon /> },
+      { label: <Translate text="Planting Calendar" />, path: '/planting-calendar', icon: <CalendarMonthIcon /> },
+      { label: <Translate text="Market place" />, path: '/map', icon: <MapIcon /> },
     ];
-  } else {
-    // Farmer items
-    return [
-      ...baseItems,
-      { label: <Translate text="My Bookings" />, path: '/my-bookings', icon: <EventIcon /> },
-      { label: <Translate text="Crop Advice" />, path: '/my-crop-requests', icon: <AgricultureIcon /> },
-    ];
-  }
-};
 
-const navItems = getNavItems();
+    // Role-specific items
+    if (user?.role === 'Extension Officer') {
+      return [
+        ...baseItems,
+        { label: <Translate text="My Events" />, path: '/my-events', icon: <EventIcon /> },
+        { label: <Translate text="Manage Bookings" />, path: '/manage-bookings', icon: <EventIcon /> },
+        { label: <Translate text="Crop Requests" />, path: '/officer/crop-requests', icon: <AgricultureIcon /> }, // ← FIXED
+      ];
+    } else {
+      // Farmer items
+      return [
+        ...baseItems,
+        { label: <Translate text="My Bookings" />, path: '/my-bookings', icon: <EventIcon /> },
+        { label: <Translate text="Crop Advice" />, path: '/my-crop-requests', icon: <AgricultureIcon /> },
+      ];
+    }
+  };
+
+  const navItems = getNavItems();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -250,10 +253,6 @@ const navItems = getNavItems();
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
   };
-
-    function handleMenuClose() {
-        throw new Error('Function not implemented.');
-    }
 
   return (
     <AppBar position="sticky" sx={{ backgroundColor: '#2e7d32' }}>
@@ -450,17 +449,18 @@ const navItems = getNavItems();
                 }}>
                 <PersonIcon sx={{ mr: 1 }} /> My Profile
             </MenuItem>
-          <MenuItem onClick={handleLogout}>
-            <LogoutIcon sx={{ mr: 1 }} /> Logout
-          </MenuItem>
-        </Menu>
-        <MenuItem onClick={() => {
-            handleMenuClose();
+          <MenuItem onClick={() => {
+            handleProfileMenuClose();
             navigate('/settings');
             }}>
             <SettingsIcon sx={{ mr: 1 }} />
             Settings
         </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleLogout}>
+            <LogoutIcon sx={{ mr: 1 }} /> Logout
+          </MenuItem>
+        </Menu>
 
         {/* Mobile Menu */}
         <Menu
@@ -502,7 +502,14 @@ const navItems = getNavItems();
             </MenuItem>
           ))}
           <Divider />
-          <MenuItem onClick={() => { navigate('/profile'); handleMobileMenuClose(); }}>
+          <MenuItem onClick={() => { 
+            const token = localStorage.getItem('token');
+            if (token) {
+                const userData = JSON.parse(atob(token.split('.')[1]));
+                navigate(`/profile/${userData.id}`);
+            }
+            handleMobileMenuClose(); 
+            }}>
             <PersonIcon sx={{ mr: 2 }} /> My Profile
           </MenuItem>
           <MenuItem onClick={handleLogout}>

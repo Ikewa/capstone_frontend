@@ -20,6 +20,7 @@ import { ToastContext } from '../context/ToastContext'
 import Translate from '../components/Translate'
 import { useTranslate } from '../hooks/useTranslate'
 import { useLanguage } from '../context/LanguageContext'
+import ImageUpload from '../components/ImageUpload'
 
 function AskQuestionPage() {
   const navigate = useNavigate()
@@ -29,12 +30,14 @@ function AskQuestionPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    image_url: ''
   })
   const [tags, setTags] = useState<string[]>([])
   const [currentTag, setCurrentTag] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  // Image upload state
+  const [questionImages, setQuestionImages] = useState<string[]>([])
 
   // Translate labels
   const labels = [
@@ -45,8 +48,8 @@ function AskQuestionPage() {
     'Description',
     'Include all the information someone would need to answer your question',
     'Describe your problem in detail. What have you tried? What are the symptoms?',
-    'Image URL (Optional)',
-    'Add an image to help explain your problem',
+    'Photos (Optional)',
+    'Upload photos to help explain your problem (max 5 images)',
     'Tags',
     'Add up to 5 tags to help others find your question',
     'Enter a tag and press Enter',
@@ -64,7 +67,7 @@ function AskQuestionPage() {
   ];
   const { translated: translatedLabels } = useTranslate(labels);
 
-  // Common tag suggestions - Don't translate (they're standard terms)
+  // Common tag suggestions
   const suggestedTags = [
     'Maize', 'Rice', 'Groundnut', 'Sorghum', 'Cowpea', 'Cassava',
     'Pest Control', 'Irrigation', 'Fertilizer', 'Soil Preparation',
@@ -144,7 +147,7 @@ function AskQuestionPage() {
       setSubmitting(true)
       setError('')
 
-      console.log('📝 Submitting question:', { ...formData, tags })
+      console.log('📝 Submitting question:', { ...formData, tags, images: questionImages })
 
       const response = await axios.post(
         'http://localhost:5000/api/questions',
@@ -152,7 +155,7 @@ function AskQuestionPage() {
           title: formData.title,
           description: formData.description,
           tags: tags,
-          image_url: formData.image_url || null
+          images: questionImages
         },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -259,7 +262,7 @@ function AskQuestionPage() {
                   />
                 </Box>
 
-                {/* Image URL Field (Optional) */}
+                {/* ✅ IMAGE UPLOAD COMPONENT */}
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
                     {translatedLabels[7]}
@@ -267,12 +270,11 @@ function AskQuestionPage() {
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     {translatedLabels[8]}
                   </Typography>
-                  <TextField
-                    fullWidth
-                    name="image_url"
-                    placeholder="https://example.com/image.jpg"
-                    value={formData.image_url}
-                    onChange={handleChange}
+                  <ImageUpload
+                    maxImages={5}
+                    uploadEndpoint="questions"
+                    onImagesUploaded={(urls) => setQuestionImages(urls)}
+                    buttonText="Add Photos to Question"
                   />
                 </Box>
 

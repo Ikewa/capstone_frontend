@@ -7,6 +7,7 @@ import {
   Typography,
   Card,
   CardContent,
+  CardMedia,
   Avatar,
   Chip,
   Divider,
@@ -292,7 +293,9 @@ function DashboardPage() {
             answers: q.answer_count || 0,
             tags: q.tags || [],
             location: q.user_location || q.location,
-            timeAgo: getTimeAgo(q.created_at)
+            timeAgo: getTimeAgo(q.created_at),
+            images: q.images || [],  // ✅ ADD IMAGES
+            image_url: q.image_url    // ✅ ADD IMAGE_URL
           }))
           
           setDiscussions(formattedDiscussions)
@@ -511,6 +514,36 @@ function DashboardPage() {
                                 <LocationOnIcon fontSize="small" />
                                 {discussion.location || 'Northern Nigeria'}
                               </Typography>
+
+                              {/* ✅ DISPLAY IMAGE IF EXISTS */}
+                              {discussion.images && discussion.images.length > 0 && (
+                                <CardMedia
+                                  component="img"
+                                  height="200"
+                                  image={discussion.images[0]}
+                                  alt="Question image"
+                                  sx={{ 
+                                    borderRadius: 2, 
+                                    mb: 2,
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              )}
+
+                              {/* Old single image support (backward compatibility) */}
+                              {!discussion.images && discussion.image_url && (
+                                <CardMedia
+                                  component="img"
+                                  height="200"
+                                  image={discussion.image_url}
+                                  alt="Question image"
+                                  sx={{ 
+                                    borderRadius: 2, 
+                                    mb: 2,
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              )}
 
                               {discussion.tags && discussion.tags.length > 0 && (
                                 <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
