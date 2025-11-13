@@ -75,7 +75,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        `http://localhost:5000/api/upload/${uploadEndpoint}`,
+        `/api/upload/${uploadEndpoint}`,
         formData,
         {
           headers: {

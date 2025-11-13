@@ -74,7 +74,7 @@ const BookingRequestPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        'http://localhost:5000/api/bookings',
+        '/api/bookings',
         formData,
         {
           headers: {

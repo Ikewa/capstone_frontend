@@ -59,7 +59,7 @@ const CropComparison = () => {
 
       const token = localStorage.getItem('token');
       const cropPromises = ids.map(id => 
-        axios.get(`http://localhost:5000/api/crop-catalog/${id}`, {
+        axios.get(`/api/crop-catalog/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       );

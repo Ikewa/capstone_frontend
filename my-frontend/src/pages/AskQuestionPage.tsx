@@ -150,7 +150,7 @@ function AskQuestionPage() {
       console.log('📝 Submitting question:', { ...formData, tags, images: questionImages })
 
       const response = await axios.post(
-        'http://localhost:5000/api/questions',
+        '/api/questions',
         {
           title: formData.title,
           description: formData.description,

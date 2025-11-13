@@ -18,7 +18,7 @@ function Home() {
     }
 
     axios
-      .get("http://localhost:5000/protected/Home", {
+      .get("/protected/Home", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

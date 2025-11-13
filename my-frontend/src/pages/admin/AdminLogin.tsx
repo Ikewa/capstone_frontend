@@ -35,7 +35,7 @@ const AdminLogin = () => {
 
     try {
       // Login request
-      const response = await axios.post('http://localhost:5000/users/login', {
+      const response = await axios.post('/users/login', {
         email: formData.email,
         password: formData.password
       });

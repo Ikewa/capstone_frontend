@@ -84,7 +84,7 @@ const CreateEventPage = () => {
       };
 
       await axios.post(
-        'http://localhost:5000/api/events',
+        '/api/events',
         payload,
         {
           headers: {

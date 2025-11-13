@@ -64,7 +64,7 @@ const NotesButton = ({ groupId, groupName }: NotesButtonProps) => {
       setLoadingNotes(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/notes', {
+      const response = await axios.get('/api/notes', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -84,7 +84,7 @@ const NotesButton = ({ groupId, groupName }: NotesButtonProps) => {
       setLoadingNotes(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get(`http://localhost:5000/api/notes?group_id=${groupId}`, {
+      const response = await axios.get(`/api/notes?group_id=${groupId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -174,7 +174,7 @@ const NotesButton = ({ groupId, groupName }: NotesButtonProps) => {
       if (currentNote) {
         // Update existing note
         await axios.put(
-          `http://localhost:5000/api/notes/${currentNote.id}`,
+          `/api/notes/${currentNote.id}`,
           noteData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -182,7 +182,7 @@ const NotesButton = ({ groupId, groupName }: NotesButtonProps) => {
       } else {
         // Create new note
         await axios.post(
-          'http://localhost:5000/api/notes',
+          '/api/notes',
           noteData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -215,7 +215,7 @@ const NotesButton = ({ groupId, groupName }: NotesButtonProps) => {
     try {
       const token = localStorage.getItem('token');
 
-      await axios.delete(`http://localhost:5000/api/notes/${noteId}`, {
+      await axios.delete(`/api/notes/${noteId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

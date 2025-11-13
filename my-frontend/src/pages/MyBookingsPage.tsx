@@ -41,7 +41,7 @@ const MyBookingsPage = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/bookings/my-bookings', {
+      const response = await axios.get('/api/bookings/my-bookings', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -66,7 +66,7 @@ const MyBookingsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.put(
-        `http://localhost:5000/api/bookings/${bookingId}/cancel`,
+        `/api/bookings/${bookingId}/cancel`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

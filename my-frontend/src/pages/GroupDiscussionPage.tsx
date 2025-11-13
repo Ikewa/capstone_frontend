@@ -227,7 +227,7 @@ const GroupDiscussionPage = () => {
   const fetchGroup = async () => {
     const token = localStorage.getItem('token');
     const response = await axios.get(
-      `http://localhost:5000/api/discussion-groups/${id}`,
+      `/api/discussion-groups/${id}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     console.log('✅ Group loaded:', response.data);
@@ -244,7 +244,7 @@ const GroupDiscussionPage = () => {
   const fetchMessages = async () => {
     const token = localStorage.getItem('token');
     const response = await axios.get(
-      `http://localhost:5000/api/discussion-groups/${id}/messages`,
+      `/api/discussion-groups/${id}/messages`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     console.log('✅ Messages loaded:', response.data);
@@ -254,7 +254,7 @@ const GroupDiscussionPage = () => {
   const fetchMembers = async () => {
     const token = localStorage.getItem('token');
     const response = await axios.get(
-      `http://localhost:5000/api/discussion-groups/${id}/members`,
+      `/api/discussion-groups/${id}/members`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     console.log('✅ Members loaded:', response.data);
@@ -272,7 +272,7 @@ const GroupDiscussionPage = () => {
       const token = localStorage.getItem('token');
 
       const response = await axios.post(
-        `http://localhost:5000/api/discussion-groups/${id}/messages`,
+        `/api/discussion-groups/${id}/messages`,
         {
           content: newMessage.trim(),
           parent_message_id: replyingTo?.id || null
@@ -309,7 +309,7 @@ const GroupDiscussionPage = () => {
       const token = localStorage.getItem('token');
 
       const response = await axios.post(
-        `http://localhost:5000/api/discussion-groups/messages/${messageId}/react`,
+        `/api/discussion-groups/messages/${messageId}/react`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -356,7 +356,7 @@ const GroupDiscussionPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/discussion-groups/messages/${messageId}`,
+        `/api/discussion-groups/messages/${messageId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -379,7 +379,7 @@ const GroupDiscussionPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        `http://localhost:5000/api/discussion-groups/${id}/leave`,
+        `/api/discussion-groups/${id}/leave`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -402,7 +402,7 @@ const GroupDiscussionPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/discussion-groups/${id}`,
+        `/api/discussion-groups/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -421,7 +421,7 @@ const GroupDiscussionPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.put(
-        `http://localhost:5000/api/discussion-groups/${id}`,
+        `/api/discussion-groups/${id}`,
         editedGroup,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -445,7 +445,7 @@ const GroupDiscussionPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/discussion-groups/${id}/members/${memberId}`,
+        `/api/discussion-groups/${id}/members/${memberId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -464,7 +464,7 @@ const GroupDiscussionPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        `http://localhost:5000/api/discussion-groups/${id}/members/${memberId}/make-admin`,
+        `/api/discussion-groups/${id}/members/${memberId}/make-admin`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -130,7 +130,7 @@ const CropRecommendationRequestPage: React.FC = () => {
 
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/crop-requests/upload-images',
+        '/api/crop-requests/upload-images',
         formData,
         {
           headers: {
@@ -188,7 +188,7 @@ const CropRecommendationRequestPage: React.FC = () => {
       const token = localStorage.getItem('token');
       
       const response = await axios.post(
-        'http://localhost:5000/api/crop-requests',
+        '/api/crop-requests',
         {
           ...formData,
           landSize: parseFloat(formData.landSize),

@@ -50,15 +50,15 @@ const UniversalSearch: React.FC = () => {
       const token = localStorage.getItem('token');
       
       const [questionsRes, eventsRes, cropRequestsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/questions', {
+        axios.get('/api/questions', {
           headers: { Authorization: `Bearer ${token}` }
         }).catch(() => ({ data: { questions: [] } })),
         
-        axios.get('http://localhost:5000/api/events', {
+        axios.get('/api/events', {
           headers: { Authorization: `Bearer ${token}` }
         }).catch(() => ({ data: { events: [] } })),
         
-        axios.get('http://localhost:5000/api/crop-requests/my-requests', {
+        axios.get('/api/crop-requests/my-requests', {
           headers: { Authorization: `Bearer ${token}` }
         }).catch(() => ({ data: { requests: [] } }))
       ]);

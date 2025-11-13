@@ -80,7 +80,7 @@ function ForumPage() {
       setLoading(true)
       setError('')
 
-      let url = 'http://localhost:5000/api/questions'
+      let url = '/api/questions'
       const params = new URLSearchParams()
       
       if (search) params.append('search', search)
@@ -137,7 +137,7 @@ function ForumPage() {
       console.log('🗳️ Voting:', voteType, 'on question', questionId)
 
       await axios.post(
-        'http://localhost:5000/forum/vote',
+        '/forum/vote',
         {
           votable_type: 'question',
           votable_id: questionId,

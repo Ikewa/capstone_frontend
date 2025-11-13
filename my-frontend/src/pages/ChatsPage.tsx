@@ -76,7 +76,7 @@ const ChatsPage = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/chat/conversations', {
+      const response = await axios.get('/api/chat/conversations', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -96,7 +96,7 @@ const ChatsPage = () => {
       setLoadingBlocked(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/chat/blocked', {
+      const response = await axios.get('/api/chat/blocked', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -132,7 +132,7 @@ const ChatsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/chat/conversation/${selectedConversation.id}`,
+        `/api/chat/conversation/${selectedConversation.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -157,7 +157,7 @@ const ChatsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        'http://localhost:5000/api/chat/block',
+        '/api/chat/block',
         { user_id: selectedConversation.other_user_id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -176,7 +176,7 @@ const ChatsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        'http://localhost:5000/api/chat/unblock',
+        '/api/chat/unblock',
         { user_id: userId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

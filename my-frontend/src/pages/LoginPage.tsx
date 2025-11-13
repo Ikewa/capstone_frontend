@@ -58,7 +58,7 @@ function LoginPage() {
         password: formData.password,
       }
 
-      const response = await axios.post('http://localhost:5000/users/login', loginData)
+      const response = await axios.post('/users/login', loginData)
       
       // Save token and user data to localStorage
       if (response.data.token) {

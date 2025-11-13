@@ -99,6 +99,7 @@ function DashboardPage() {
     {
       id: 1,
       title: 'How to control armyworm in maize?',
+      description: 'I need help controlling armyworms that are destroying my maize crop.',
       author: 'Musa Ibrahim',
       role: 'Farmer',
       votes: 24,
@@ -110,6 +111,7 @@ function DashboardPage() {
     {
       id: 2,
       title: 'Best irrigation for dry season farming?',
+      description: 'Looking for efficient irrigation methods suitable for dry season.',
       author: 'Fatima Ahmed',
       role: 'Extension Officer',
       votes: 18,
@@ -121,6 +123,7 @@ function DashboardPage() {
     {
       id: 3,
       title: 'Groundnut planting techniques',
+      description: 'What are the best techniques for planting groundnut in sandy soil?',
       author: 'Abubakar Sani',
       role: 'Farmer',
       votes: 15,
@@ -132,6 +135,7 @@ function DashboardPage() {
     {
       id: 4,
       title: 'Organic fertilizer recommendations for rice',
+      description: 'Can anyone recommend good organic fertilizers for rice farming?',
       author: 'Hauwa Bello',
       role: 'Extension Officer',
       votes: 22,
@@ -143,6 +147,7 @@ function DashboardPage() {
     {
       id: 5,
       title: 'How to store harvested grains to prevent weevils?',
+      description: 'My stored grains keep getting infested with weevils. Any solutions?',
       author: 'Yusuf Mohammed',
       role: 'Farmer',
       votes: 19,
@@ -154,6 +159,7 @@ function DashboardPage() {
     {
       id: 6,
       title: 'Best time to plant sorghum in Northern Nigeria',
+      description: 'When is the optimal planting season for sorghum in our region?',
       author: 'Amina Usman',
       role: 'Extension Officer',
       votes: 16,
@@ -165,6 +171,7 @@ function DashboardPage() {
     {
       id: 7,
       title: 'Dealing with soil erosion on sloped farmland',
+      description: 'My farm is on a slope and experiencing severe erosion. Need advice.',
       author: 'Ibrahim Yakubu',
       role: 'Farmer',
       votes: 14,
@@ -176,6 +183,7 @@ function DashboardPage() {
     {
       id: 8,
       title: 'Cassava disease identification and treatment',
+      description: 'My cassava plants have strange spots. How do I identify and treat this?',
       author: 'Blessing Okon',
       role: 'Extension Officer',
       votes: 20,
@@ -187,6 +195,7 @@ function DashboardPage() {
     {
       id: 9,
       title: 'Improving yield for small-scale poultry farming',
+      description: 'Tips for increasing egg production in a small poultry operation?',
       author: 'Ahmed Lawal',
       role: 'Farmer',
       votes: 17,
@@ -198,6 +207,7 @@ function DashboardPage() {
     {
       id: 10,
       title: 'Intercropping maize and beans: best practices',
+      description: 'What spacing should I use for intercropping maize with beans?',
       author: 'Zainab Abubakar',
       role: 'Extension Officer',
       votes: 21,
@@ -260,7 +270,7 @@ function DashboardPage() {
     }
 
     axios
-      .get('http://localhost:5000/protected/Home', {
+      .get('/protected/Home', {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then((res) => {
@@ -278,7 +288,7 @@ function DashboardPage() {
   useEffect(() => {
     const fetchDiscussions = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/questions')
+        const response = await axios.get('/api/questions')
         
         if (response.data.questions && response.data.questions.length > 0) {
           console.log('✅ Fetched questions from database:', response.data.questions.length)
@@ -287,6 +297,7 @@ function DashboardPage() {
           const formattedDiscussions = response.data.questions.map((q: any) => ({
             id: q.id,
             title: q.title,
+            description: q.description,  // ✅ ADD DESCRIPTION
             author: `${q.first_name} ${q.last_name}`,
             role: q.role || 'Farmer',
             votes: q.votes || 0,
@@ -294,8 +305,8 @@ function DashboardPage() {
             tags: q.tags || [],
             location: q.user_location || q.location,
             timeAgo: getTimeAgo(q.created_at),
-            images: q.images || [],  // ✅ ADD IMAGES
-            image_url: q.image_url    // ✅ ADD IMAGE_URL
+            images: q.images || [],
+            image_url: q.image_url
           }))
           
           setDiscussions(formattedDiscussions)
@@ -509,6 +520,24 @@ function DashboardPage() {
                               >
                                 {discussion.title}
                               </Typography>
+
+                              {/* ✅ ADD DESCRIPTION HERE */}
+                              {discussion.description && (
+                                <Typography 
+                                  variant="body2" 
+                                  color="text.secondary" 
+                                  sx={{ 
+                                    mb: 1.5,
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                  }}
+                                >
+                                  {discussion.description}
+                                </Typography>
+                              )}
 
                               <Typography variant="body2" color="text.secondary" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                 <LocationOnIcon fontSize="small" />

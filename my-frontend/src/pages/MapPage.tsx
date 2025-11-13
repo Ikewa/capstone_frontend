@@ -103,7 +103,7 @@ const MapPage = () => {
   const fetchLocations = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/locations');
+      const response = await axios.get('/api/locations');
       
       console.log('✅ Locations loaded:', response.data);
       setLocations(response.data.locations);
@@ -120,7 +120,7 @@ const MapPage = () => {
 
   const fetchStates = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/locations/states');
+      const response = await axios.get('/api/locations/states');
       setStates(response.data.states);
     } catch (err) {
       console.error('Error loading states:', err);

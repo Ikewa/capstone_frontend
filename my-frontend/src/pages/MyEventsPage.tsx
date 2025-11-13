@@ -54,7 +54,7 @@ const MyEventsPage = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/events/my/events', {
+      const response = await axios.get('/api/events/my/events', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -79,7 +79,7 @@ const MyEventsPage = () => {
       const token = localStorage.getItem('token');
 
       const response = await axios.get(
-        `http://localhost:5000/api/events/${event.id}/registrations`,
+        `/api/events/${event.id}/registrations`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -101,7 +101,7 @@ const MyEventsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/events/${eventId}`,
+        `/api/events/${eventId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

@@ -62,7 +62,7 @@ const AdminGroups = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/admin/groups', {
+      const response = await axios.get('/api/admin/groups', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -97,7 +97,7 @@ const AdminGroups = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/admin/groups/${selectedGroup.id}`,
+        `/api/admin/groups/${selectedGroup.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

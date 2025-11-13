@@ -101,7 +101,7 @@ const RequestDetailPage: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `http://localhost:5000/api/crop-requests/${id}`,
+        `/api/crop-requests/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -150,7 +150,7 @@ const RequestDetailPage: React.FC = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        `http://localhost:5000/api/crop-requests/${id}/respond`,
+        `/api/crop-requests/${id}/respond`,
         {
           recommendedCrops: validCrops,
           officerNotes

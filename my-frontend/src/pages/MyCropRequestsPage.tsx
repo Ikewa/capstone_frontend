@@ -75,7 +75,7 @@ const MyCropRequestsPage: React.FC = () => {
   const fetchRequests = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/crop-requests/my-requests', {
+      const response = await axios.get('/api/crop-requests/my-requests', {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('✅ My requests:', response.data);

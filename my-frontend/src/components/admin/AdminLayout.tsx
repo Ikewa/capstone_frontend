@@ -28,7 +28,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         }
 
         // Verify admin access
-        const response = await axios.get('http://localhost:5000/protected/Home', {
+        const response = await axios.get('/protected/Home', {
           headers: { Authorization: `Bearer ${token}` }
         });
 

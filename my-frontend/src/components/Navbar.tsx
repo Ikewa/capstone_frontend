@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
   const fetchUnreadCount = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/notifications/unread-count', {
+      const response = await axios.get('/api/notifications/unread-count', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUnreadCount(response.data.unreadCount);
@@ -89,7 +89,7 @@ const Navbar: React.FC = () => {
     setLoadingNotifications(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/notifications', {
+      const response = await axios.get('/api/notifications', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(response.data.notifications);
@@ -106,7 +106,7 @@ const Navbar: React.FC = () => {
       try {
         const token = localStorage.getItem('token');
         await axios.put(
-          `http://localhost:5000/api/notifications/${notification.id}/read`,
+          `/api/notifications/${notification.id}/read`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -134,7 +134,7 @@ const Navbar: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        'http://localhost:5000/api/notifications/mark-all-read',
+        '/api/notifications/mark-all-read',
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -152,7 +152,7 @@ const Navbar: React.FC = () => {
     
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/notifications/${notificationId}`, {
+      await axios.delete(`/api/notifications/${notificationId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

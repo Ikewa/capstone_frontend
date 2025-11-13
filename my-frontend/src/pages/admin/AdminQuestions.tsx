@@ -71,7 +71,7 @@ const AdminQuestions = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/questions', {
+      const response = await axios.get('/api/questions', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -113,7 +113,7 @@ const AdminQuestions = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/admin/questions/${selectedQuestion.id}`,
+        `/api/admin/questions/${selectedQuestion.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

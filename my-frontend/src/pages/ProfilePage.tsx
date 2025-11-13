@@ -59,7 +59,7 @@ const ProfilePage = () => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/api/profile/${id}`);
+      const response = await axios.get(`/api/profile/${id}`);
       console.log('✅ Profile loaded:', response.data);
       setProfile(response.data);
       setError('');
@@ -117,7 +117,7 @@ const handleStartChat = async (event: React.MouseEvent<HTMLButtonElement, MouseE
 
     // Create or get conversation
     const response = await axios.post(
-      'http://localhost:5000/api/chat/conversation',
+      '/api/chat/conversation',
       { other_user_id: parseInt(user.id) },
       { headers: { Authorization: `Bearer ${token}` } }
     );

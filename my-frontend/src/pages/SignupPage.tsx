@@ -134,7 +134,7 @@ function SignupPage() {
 
     try {
       // Call the backend API
-      const response = await axios.post('http://localhost:5000/users/signup', formData)
+      const response = await axios.post('/users/signup', formData)
       
       console.log("✅ Signup successful:", response.data)
       

@@ -60,7 +60,7 @@ const CropCatalogPage = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:5000/api/crop-catalog/recommendations?${params}`,
+        `/api/crop-catalog/recommendations?${params}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

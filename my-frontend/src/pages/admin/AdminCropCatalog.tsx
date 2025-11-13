@@ -63,7 +63,7 @@ const AdminCropCatalog = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/crop-catalog', {
+      const response = await axios.get('/api/crop-catalog', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -98,7 +98,7 @@ const AdminCropCatalog = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/admin/crops/${selectedCrop.id}`,
+        `/api/admin/crops/${selectedCrop.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

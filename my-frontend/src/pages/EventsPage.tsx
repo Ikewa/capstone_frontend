@@ -90,7 +90,7 @@ function EventsPage() {
   const fetchEvents = async () => {
     try {
       setLoading(true)
-      let url = 'http://localhost:5000/api/events'
+      let url = '/api/events'
       const params = new URLSearchParams()
       
       if (search) params.append('search', search)

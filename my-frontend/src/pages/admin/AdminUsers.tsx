@@ -103,7 +103,7 @@ const AdminUsers = () => {
       params.append('limit', String(rowsPerPage));
 
       const response = await axios.get(
-        `http://localhost:5000/api/admin/users?${params.toString()}`,
+        `/api/admin/users?${params.toString()}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -150,7 +150,7 @@ const AdminUsers = () => {
       const token = localStorage.getItem('token');
 
       await axios.put(
-        `http://localhost:5000/api/admin/users/${selectedUser.id}`,
+        `/api/admin/users/${selectedUser.id}`,
         editedUser,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -174,7 +174,7 @@ const AdminUsers = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/admin/users/${selectedUser.id}`,
+        `/api/admin/users/${selectedUser.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -197,7 +197,7 @@ const AdminUsers = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        `http://localhost:5000/api/admin/users/${selectedUser.id}/make-admin`,
+        `/api/admin/users/${selectedUser.id}/make-admin`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -221,7 +221,7 @@ const AdminUsers = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        `http://localhost:5000/api/admin/users/${selectedUser.id}/remove-admin`,
+        `/api/admin/users/${selectedUser.id}/remove-admin`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

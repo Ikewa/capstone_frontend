@@ -60,7 +60,7 @@ function EventDetailPage() {
   const fetchEvent = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`http://localhost:5000/api/events/${id}`)
+      const response = await axios.get(`/api/events/${id}`)
       setEvent(response.data.event)
       
       // Check if current user is registered
@@ -98,7 +98,7 @@ function EventDetailPage() {
       setSuccess('')
 
       await axios.post(
-        'http://localhost:5000/api/events/register',
+        '/api/events/register',
         { event_id: parseInt(id!) },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -127,7 +127,7 @@ function EventDetailPage() {
       setSuccess('')
 
       await axios.post(
-        'http://localhost:5000/api/events/cancel',
+        '/api/events/cancel',
         { event_id: parseInt(id!) },
         { headers: { Authorization: `Bearer ${token}` } }
       )

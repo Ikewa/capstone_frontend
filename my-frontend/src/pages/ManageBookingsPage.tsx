@@ -62,10 +62,10 @@ const ManageBookingsPage = () => {
       const token = localStorage.getItem('token');
 
       const [pendingRes, appointmentsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/bookings/pending', {
+        axios.get('/api/bookings/pending', {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5000/api/bookings/my-appointments', {
+        axios.get('/api/bookings/my-appointments', {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -87,7 +87,7 @@ const ManageBookingsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.put(
-        `http://localhost:5000/api/bookings/${bookingId}/accept`,
+        `/api/bookings/${bookingId}/accept`,
         { officer_notes: officerNotes[bookingId] || '' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -110,7 +110,7 @@ const ManageBookingsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.put(
-        `http://localhost:5000/api/bookings/${bookingId}/decline`,
+        `/api/bookings/${bookingId}/decline`,
         { officer_notes: officerNotes[bookingId] || '' },
         { headers: { Authorization: `Bearer ${token}` } }
       );

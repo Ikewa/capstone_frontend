@@ -108,7 +108,7 @@ const DiscussionGroupsPage = () => {
       if (selectedLocation) params.append('location', selectedLocation);
 
       const response = await axios.get(
-        `http://localhost:5000/api/discussion-groups?${params.toString()}`,
+        `/api/discussion-groups?${params.toString()}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -140,7 +140,7 @@ const DiscussionGroupsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        'http://localhost:5000/api/discussion-groups',
+        '/api/discussion-groups',
         newGroup,
         { headers: { Authorization: `Bearer ${token}` } }
       );

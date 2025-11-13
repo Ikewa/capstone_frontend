@@ -81,7 +81,7 @@ const SettingsPage = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/profile/me/profile', {
+      const response = await axios.get('/api/profile/me/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -122,7 +122,7 @@ const SettingsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.put(
-        'http://localhost:5000/api/profile/me/profile',
+        '/api/profile/me/profile',
         {
           first_name: profileData.first_name,
           last_name: profileData.last_name,
@@ -182,7 +182,7 @@ const SettingsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.put(
-        'http://localhost:5000/api/profile/me/password',
+        '/api/profile/me/password',
         {
           current_password: passwordData.current_password,
           new_password: passwordData.new_password
@@ -231,7 +231,7 @@ const SettingsPage = () => {
       const token = localStorage.getItem('token');
 
       await axios.put(
-        'http://localhost:5000/api/profile/me/avatar',
+        '/api/profile/me/avatar',
         { avatar_url: avatarUrl },
         {
           headers: { Authorization: `Bearer ${token}` }

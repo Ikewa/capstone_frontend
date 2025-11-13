@@ -68,7 +68,7 @@ const OfficerCropRequestsPage: React.FC = () => {
       console.log('🔍 Fetching pending requests...');
 
       const response = await axios.get(
-        'http://localhost:5000/api/crop-requests/pending/all',
+        '/api/crop-requests/pending/all',
         {
           headers: { Authorization: `Bearer ${token}` },
         }

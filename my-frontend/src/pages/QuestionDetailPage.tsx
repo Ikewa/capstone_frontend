@@ -144,7 +144,7 @@ function QuestionDetailPage() {
       setLoading(true)
       setError('')
 
-      const response = await axios.get(`http://localhost:5000/api/questions/${id}`)
+      const response = await axios.get(`/api/questions/${id}`)
       console.log('📦 Question data:', response.data.question)
       setQuestion(response.data.question)
       setLoading(false)
@@ -169,7 +169,7 @@ function QuestionDetailPage() {
       }
 
       await axios.post(
-        'http://localhost:5000/api/vote',
+        '/api/vote',
         {
           votable_type: 'question',
           votable_id: parseInt(id!),
@@ -210,7 +210,7 @@ function QuestionDetailPage() {
       }
 
       await axios.post(
-        'http://localhost:5000/api/vote',
+        '/api/vote',
         {
           votable_type: 'answer',
           votable_id: answerId,
@@ -251,7 +251,7 @@ function QuestionDetailPage() {
       }
 
       await axios.post(
-        'http://localhost:5000/api/accept-answer',
+        '/api/accept-answer',
         { answer_id: answerId },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -297,7 +297,7 @@ function QuestionDetailPage() {
       setSubmitting(true)
 
       await axios.post(
-        'http://localhost:5000/api/answers',
+        '/api/answers',
         {
           question_id: parseInt(id!),
           content: answerContent

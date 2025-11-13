@@ -104,7 +104,7 @@ const ChatPage = () => {
 
       // First, get conversation details
       const convResponse = await axios.get(
-        `http://localhost:5000/api/chat/conversations`,
+        `/api/chat/conversations`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -127,7 +127,7 @@ const ChatPage = () => {
 
       // Get messages
       const messagesResponse = await axios.get(
-        `http://localhost:5000/api/chat/messages/${conversation_id}`,
+        `/api/chat/messages/${conversation_id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -164,7 +164,7 @@ const ChatPage = () => {
       console.log('📤 Sending message to user:', otherUser.id);
 
       const response = await axios.post(
-        'http://localhost:5000/api/chat/messages',
+        '/api/chat/messages',
         {
           conversation_id: parseInt(conversation_id!),
           receiver_id: parseInt(otherUser.id),

@@ -61,7 +61,7 @@ const GrowingGuide = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get(`http://localhost:5000/api/crop-catalog/${id}`, {
+      const response = await axios.get(`/api/crop-catalog/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

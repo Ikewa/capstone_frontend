@@ -65,7 +65,7 @@ const AdminEvents = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/admin/events', {
+      const response = await axios.get('/api/admin/events', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -100,7 +100,7 @@ const AdminEvents = () => {
       const token = localStorage.getItem('token');
 
       await axios.delete(
-        `http://localhost:5000/api/admin/events/${selectedEvent.id}`,
+        `/api/admin/events/${selectedEvent.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
