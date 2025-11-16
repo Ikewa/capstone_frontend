@@ -30,7 +30,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     
     if (token) {
       // Create socket connection
-      const newSocket = io('http://localhost:5000', {
+      const newSocket = io('https://beautiful-growth-production.up.railway.app', {
         transports: ['websocket'],
         autoConnect: true
       });
