@@ -46,6 +46,7 @@ import CropDetail from './pages/CropDetail'
 import CropComparison from './pages/CropComparison'
 import PlantingCalendar from './pages/PlantingCalendar'
 import GrowingGuide from './pages/GrowingGuide'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 
 
 
@@ -104,6 +105,7 @@ function App() {
             <Route path="/map" element={<MapPage />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/crop-catalog" element={<CropCatalog />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
             {/* ==================== ADMIN ROUTES ==================== */}
             <Route path="/admin" element={<AdminLogin />} />

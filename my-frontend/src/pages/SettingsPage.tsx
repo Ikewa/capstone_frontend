@@ -15,6 +15,7 @@ import {
   Alert,
   Stack,
   Divider,
+  CardContent,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
@@ -514,6 +515,24 @@ const SettingsPage = () => {
               </form>
             </TabPanel>
           </Card>
+          <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+            Privacy & Security
+          </Typography>
+          <Button
+            variant="outlined"
+            fullWidth
+            onClick={() => navigate('/privacy-policy')}
+            sx={{ mb: 2 }}
+          >
+            View Privacy Policy
+          </Button>
+          <Typography variant="body2" color="text.secondary">
+            Learn how we protect and use your data
+          </Typography>
+        </CardContent>
+      </Card>
         </Container>
       </Box>
     </>

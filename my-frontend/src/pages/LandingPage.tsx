@@ -129,7 +129,7 @@ function LandingPage() {
               fontSize: { xs: '1rem', md: '1.1rem' }
             }}
           >
-            Bridge the knowledge gap. Share experiences. Grow together. AgriFuture brings farmers and extension officers onto one platform to exchange valuable agricultural information, solve problems, and build a stronger farming community.
+            Bridge the knowledge gap. Share experiences. Grow together. AgriConnect brings farmers and extension officers onto one platform to exchange valuable agricultural information, solve problems, and build a stronger farming community.
           </Typography>
 
           {/* Call-to-action button */}
